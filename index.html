@@ -54,7 +54,8 @@ nav.tabs{display:flex;gap:6px;background:var(--panel2);padding:6px;border-radius
 .btn.rose{background:linear-gradient(135deg,var(--peach),var(--rose));border:none;color:#fff}
 .btn.small{padding:6px 12px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
-.view{display:none}.view.active{display:grid;gap:18px}
+.view{display:none}.view.active{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+.app{grid-template-columns:minmax(0,1fr)}.card{min-width:0}
 
 /* plan */
 .plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -150,6 +151,17 @@ details.qs pre{white-space:pre-wrap;font-family:"Lora",serif;font-size:15px;line
 .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .tools input{font:inherit;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--text);min-width:200px}
 
+/* units strip */
+.ustrip{display:flex;gap:10px;overflow-x:auto;padding:12px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.ustrip.all{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));overflow:visible;max-height:420px;overflow-y:auto}
+.uc{flex:none;width:170px;scroll-snap-align:center;background:var(--panel2);border:2px solid transparent;border-radius:16px;padding:10px 12px;cursor:pointer;text-align:left;font:inherit;color:var(--text);transition:.15s}
+.ustrip.all .uc{width:auto}
+.uc:hover{border-color:var(--line);transform:translateY(-1px)}
+.uc .n{font-size:12px;font-weight:800;color:var(--muted);display:flex;justify-content:space-between}
+.uc .t{font-weight:700;font-size:14px;line-height:1.3;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.uc.cur{border-color:var(--lilac);background:var(--panel);box-shadow:0 6px 16px -10px #9a86d4}
+.uc.done .n span{color:#5f9f72}
+.uc.part .n span{color:var(--B2)}
 /* grammar */
 .gbody{font-size:16px;line-height:1.8}
 .gp{margin:0 0 14px}
@@ -216,6 +228,12 @@ input[type=file]{display:none}
 
   <!-- TODAY -->
   <section class="view active" id="v-today">
+    <div class="card" id="unitsCard" hidden>
+      <div class="unit-head"><h2 style="margin:0">📚 Metinler</h2>
+        <div style="display:flex;gap:8px;align-items:center"><span class="muted" id="uCount" style="font-weight:800;font-size:13px"></span>
+        <button class="btn small" id="uAll">Tümünü gör</button></div></div>
+      <div class="ustrip" id="ustrip"></div>
+    </div>
     <div class="card">
       <h2>Bugünün planı</h2>
       <div class="plan">
@@ -442,9 +460,24 @@ function splitSentences(p){
   const out=[];for(const x of parts){if(out.length&&x.length<12)out[out.length-1]+=' '+x;else out.push(x)}
   return out;
 }
+let uAll=false;
+function renderUnits(){
+  const has=$('readerCard').dataset.has==='1'; $('unitsCard').hidden=!has; if(!has)return;
+  const done=S.doneU||{}, stt=S.st||{};
+  $('uCount').textContent=`${Object.keys(done).length} / ${UNITS.length} bitti`;
+  const box=$('ustrip'); box.classList.toggle('all',uAll); $('uAll').textContent=uAll?'Kapat':'Tümünü gör';
+  box.innerHTML=UNITS.map((u,i)=>{const d=done[u.n],part=!d&&stt[u.n]&&Object.values(stt[u.n]).some(v=>v.trim());
+    return `<button class="uc${i===S.unitIdx?' cur':''}${d?' done':''}${part?' part':''}" data-i="${i}"><div class="n">Ünite ${u.n}<span>${d?'✓ bitti':part?'● yarım':i===S.unitIdx?'▶ şimdi':''}</span></div><div class="t">${esc(u.t)}</div></button>`}).join('');
+  const cur=box.querySelector('.uc.cur'); requestAnimationFrame(()=>{if(cur&&!uAll) box.scrollLeft=cur.offsetLeft-box.clientWidth/2+cur.offsetWidth/2;
+  else if(cur) box.scrollTop=cur.offsetTop-box.offsetTop-150;});
+}
+$('ustrip').onclick=e=>{const b=e.target.closest('.uc');if(!b)return;S.unitIdx=+b.dataset.i;save();renderReader();renderPlan();syncUnitSel();
+  setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth',block:'start'}),60)};
+$('uAll').onclick=()=>{uAll=!uAll;renderUnits()};
 async function renderReader(){
   const card=$('readerCard');
   const has=await getFile('reader');
+  card.dataset.has=has?'1':'0'; renderUnits();
   if(!has){card.innerHTML=`<div class="empty">📖 Başlamak için kitabını bir kere yükle.<br><br><label class="btn primary">Reader at Work PDF'ini seç<input type="file" accept="application/pdf" id="fileR2"></label></div>`;
     $('fileR2').onchange=e=>handleUpload('reader',e.target.files[0]);return}
   if(S.unitIdx>=UNITS.length){card.innerHTML='<div class="empty">🎉 Kitabın tamamını bitirdin! Sırada Reader at Work 2 ve IELTS okuma parçaları var.</div>';return}
@@ -460,16 +493,14 @@ async function renderReader(){
     <div class="unit-head"><div><div class="unit-no">ÜNİTE ${u.n} / 204</div><h2>${esc(u.t)}</h2></div>
       <div class="legend">${S.hl?'<span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span>':''}<span><i style="background:var(--sage);height:10px;opacity:.5"></i>kelimelerimde</span></div></div>
     <div class="progress"><div style="width:${pct}%"></div></div>
-    ${!data.found?'<div class="empty">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Sayfa görüntüsüne bakabilir ya da atlayabilirsin.</div>':!data.paras.length?'<div class="empty">Bu ünitenin metni PDF\'ten okunamadı. Aşağıdan sayfa görüntüsüne bakabilirsin.</div>':`
+    ${!data.found?'<div class="empty">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Bu üniteyi atlayabilirsin.</div>':!data.paras.length?'<div class="empty">Bu ünitenin metni PDF\'ten okunamadı. Bu üniteyi atlayabilirsin.</div>':`
     <div id="paras" class="${S.hl?'hl':''}">
       <div class="sec-t">📖 Okuma metni <small>Önce baştan sona oku · cümlenin üzerine gelince çevirini görürsün</small></div>
       <div class="reading en" id="readText">${sents.map((ss,i)=>`<p>${ss.map((x,j)=>`<span class="sent${(st[i+'.'+j]||'').trim()?' has':''}" data-id="${i}.${j}">${wrapWords(x)}</span>`).join(' ')}</p>`).join('')}</div>
       <div class="sec-t">✍️ Cümle cümle çeviri <small id="sCount">${nDone} / ${flat.length} cümle</small></div>
-      ${Object.values(old).some(v=>v&&v.trim())?`<details class="qs" style="margin:0 0 10px"><summary>Eski paragraf çevirilerin</summary><pre>${esc(Object.values(old).filter(v=>v.trim()).join('\n\n'))}</pre></details>`:''}
       <div class="slist">${flat.map((f,n)=>`<div class="srow${(st[f.id]||'').trim()?' done':''}" data-id="${f.id}"><div class="no">${n+1}</div><div><div class="ens en"><span class="sent" data-id="${f.id}">${wrapWords(f.t)}</span></div><textarea rows="1" data-id="${f.id}" placeholder="Türkçesi…">${esc(st[f.id]||'')}</textarea></div></div>`).join('')}</div>
     </div>`}
     ${data.questions?`<details class="qs"><summary>❓ Ünitenin soruları</summary><pre>${esc(data.questions)}</pre></details>`:''}
-    <details class="qs" id="imgDet"><summary>🖼️ Sayfanın orijinal görüntüsü</summary><div class="pageimg" id="pageimg"></div></details>
     <div class="reader-actions">
       <div style="display:flex;gap:8px"><button class="btn small" id="prevU" ${S.unitIdx===0?'disabled':''}>← Önceki</button><button class="btn small" id="skipU">Atla →</button></div>
       <button class="btn primary" id="doneU">Üniteyi bitirdim ✓</button>
@@ -488,13 +519,12 @@ async function renderReader(){
   if(rt){rt.addEventListener('mouseover',e=>{const se=e.target.closest('.sent');if(!se)return;showTip(se,(S.st[u.n]||{})[se.dataset.id])});
     rt.addEventListener('mouseleave',hideTip);
     rt.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest?.('.sent'))hideTip()});}
-  $('imgDet').ontoggle=e=>{if(e.target.open&&!$('pageimg').childElementCount)renderPages('reader',u.s,u.e,$('pageimg'))};
   $('prevU').onclick=()=>{S.unitIdx--;save();renderReader();syncUnitSel()};
   $('skipU').onclick=()=>{S.unitIdx++;save();renderReader();syncUnitSel()};
   $('doneU').onclick=()=>{
     const filled=Object.values(S.st[u.n]||{}).filter(v=>v.trim()).length+Object.values(S.trans[u.n]||{}).filter(v=>v.trim()).length;
     if(data.paras.length&&!filled&&!confirm('Hiç çeviri yazmadın. Yine de bitti sayılsın mı?'))return;
-    logDay('read');S.unitIdx++;save();toast(`Ünite ${u.n} tamam 🌿`);renderReader();renderPlan();syncUnitSel();window.scrollTo({top:0,behavior:'smooth'})};
+    S.doneU=S.doneU||{};S.doneU[u.n]=dayKey();logDay('read');S.unitIdx++;save();toast(`Ünite ${u.n} tamam 🌿`);renderReader();renderPlan();syncUnitSel();window.scrollTo({top:0,behavior:'smooth'})};
 }
 function showTip(se,t){const tip=$('stip');tip.textContent=t&&t.trim()?t:'Bu cümleyi henüz çevirmedin';tip.classList.toggle('empty',!(t&&t.trim()));
   const r=se.getClientRects()[0]||se.getBoundingClientRect();tip.classList.add('show');
