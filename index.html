@@ -168,6 +168,8 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 .vcard.done img{opacity:.6}
 .vcard .vt{font-size:13.5px;font-weight:500;margin-top:6px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-right:22px}
 .vcard .del{position:absolute;right:0;bottom:2px}
+.vcard .len{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.75);color:#fff;font-size:11px;font-weight:600;border-radius:4px;padding:1px 6px}
+.vcard .vn{font-size:12px;color:var(--muted);margin-top:2px}
 .vframe{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
 .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vnote{width:100%;min-height:110px;font:inherit;font-size:15px;line-height:1.6;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;color:var(--text);resize:vertical}
@@ -335,8 +337,11 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
   <section class="view" id="v-listen">
     <div class="page-h"><h1>Dinleme</h1><p>Her gün okuma ekranında <b>Dikte</b> modunu kullan; haftada birkaç kez de aşağıdaki kaynaklardan gerçek İngilizce dinle.</p></div>
     <div class="card"><div class="week" id="weekBox"></div></div>
+    <div class="card"><div class="unit-head" style="margin-bottom:12px"><h2 style="margin:0">Video kütüphanesi</h2><div class="seg" id="libSeg"></div></div>
+      <p class="muted" style="font-size:14px;margin-bottom:12px" id="libDesc"></p>
+      <div class="vgrid" id="libList"></div></div>
     <div class="card"><h2>Kaynaklar</h2><div class="res" id="resList"></div></div>
-    <div class="card"><h2>Videolarım</h2>
+    <div class="card"><h2>Kendi videoların</h2>
       <p class="muted" style="font-size:14px;margin-bottom:10px">YouTube'dan beğendiğin bir videonun linkini yapıştır; burada İngilizce altyazıyla açılır, yanına not alırsın.</p>
       <div class="lform"><input id="vUrl" placeholder="YouTube linki (youtube.com/watch?v=… ya da youtu.be/…)" style="flex:2;min-width:240px"><input id="vTitle" placeholder="Başlık (boş bırakırsan kendisi bulur)" style="flex:1;min-width:180px"><button class="btn primary" id="vAdd">Ekle</button></div>
       <div class="vsug">Video bulmak için:
@@ -422,7 +427,7 @@ function prepState(){
   if(!S.books.r1){S.books.r1={unitIdx:S.unitIdx||0,doneU:S.doneU||{},st:S.st||{}}}
   delete S.unitIdx;delete S.doneU;delete S.st;
   for(const b of BOOKS) S.books[b.id]=Object.assign({unitIdx:0,doneU:{},st:{},dict:{}},S.books[b.id]);
-  S.listen=S.listen||[]; S.listenGoal=S.listenGoal||3; S.videos=S.videos||[];
+  S.listen=S.listen||[]; S.listenGoal=S.listenGoal||3; S.videos=S.videos||[]; S.vlib=S.vlib||{};
   for(const k of ['unitIdx','doneU','st','dict']) Object.defineProperty(S,k,{get(){return S.books[S.book||'r1'][k]},set(v){S.books[S.book||'r1'][k]=v},enumerable:false,configurable:true});
   setBook(S.book||'r1',true);
 }
@@ -833,10 +838,34 @@ function renderListen(){
   $('goalSel').onchange=e=>{S.listenGoal=+e.target.value;save();renderListen()};
   $('resList').innerHTML=RES.map(r=>`<div class="rcard"><b>${esc(r.name)}</b><p>${esc(r.desc)}</p><div class="meta">${esc(r.when)}</div><a class="btn small" href="${r.url}" target="_blank" rel="noopener">Aç ↗</a></div>`).join('');
   $('lSrc').innerHTML=RES.map(r=>`<option value="${r.id}">${esc(r.name.split(' · ')[1]||r.name)}</option>`).join('')+'<option value="other">Başka bir kaynak</option>';
-  renderVideos();
+  renderVideos();renderLib();
   const L=S.listen.slice().reverse();
   $('lLog').innerHTML=L.length?L.map(x=>{const r=RES.find(r=>r.id===x.src);return `<div class="wrow" style="grid-template-columns:110px 1fr auto auto"><span class="muted">${new Date(x.date).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}</span><span><b style="font-weight:600">${esc(r?r.name.split(' · ')[1]||r.name:x.src==='video'?'Video':'Başka kaynak')}</b>${x.title?' · '+esc(x.title):''}</span><span>${x.score!=null?`<b>${x.score}</b>/40`:''}</span><button class="del" data-i="${S.listen.indexOf(x)}">×</button></div>`}).join(''):'<div class="empty">Henüz kayıt yok. Bir kaynak dinleyince buraya ekle.</div>';
 }
+const LIB=[
+ {id:'bbc',name:'BBC 6 Minute English',lvl:'B1–B2',desc:'BBC Learning English\'in konu konu derlenmiş bölümleri. İki sunucunun doğal sohbeti; her bölümde yeni kelimeler açıklanıyor. Günlük dinleme için ideal.',v:[
+  ['fcN0BXzK8bg','All About Language','1 saat'],['_LlyKiROzhU','Human Emotions','1 saat'],['CYcYeTaBRvE','The Future','30 dk'],['tEL9bYk2iKE','Climate Change','30 dk'],
+  ['WMokf0EgTcA','Wellbeing','30 dk'],['nsO1H6Zk2K4','Technology and Lifestyle','30 dk'],['bKfFvme1b8I','Food','30 dk'],['m9LyXOBmQvo','Business & Work','30 dk'],
+  ['2Hko4TrWZYI','Green Issues','30 dk'],['2FrA6kHzVQ4','Art & Culture','30 dk'],['uznubNHZgoE','Human Behaviour','30 dk'],['b5DOQ7iOzO4','Lifestyle','1 saat']]},
+ {id:'teded',name:'TED-Ed',lvl:'B2',desc:'4–6 dakikalık animasyonlu bilim dersleri. Akademik kelime, net anlatım. Önce altyazısız izle, sonra altyazıyla tekrar et.',v:[
+  ['LkGOGzpbrCk','The science of hearing','5 dk'],['f2O6mQkFiiw','How to practice effectively… for just about anything','5 dk'],['OxPlCkTKhzY','The science of skin','5 dk'],
+  ['FwGH4gulLX4','The science of snowflakes','5 dk'],['qD0_yWgifDM','The science of spiciness','4 dk'],['A0edKgL9EgM','The art of the metaphor','5 dk'],
+  ['CVo225pUaSA','The science behind the myth: Homer\'s Odyssey','5 dk'],['3ezPMAoxSbw','Scientists still don\'t know the answer to this infamous question','6 dk']]},
+ {id:'ted',name:'TED ve TEDx',lvl:'C1',desc:'Uzun akademik konuşmalar: IELTS Listening 4. bölüm (ders/sunum) için en iyi hazırlık. Not alarak dinle, ana fikri ve 3 destekleyici noktayı yaz.',v:[
+  ['LNHBMFCzznE','Lara Boyd: After watching this, your brain will not be the same','14 dk'],['O96fE1E-rf8','Barbara Oakley: Learning how to learn','17 dk'],
+  ['LdDnPYr6R0o','Wendy Suzuki: Exercise and the brain','13 dk'],['WmRGNunPj3c','Robert Stickgold: Sleep, memory and dreams','18 dk'],
+  ['tlWuP7wESZw','Ilissa Ocko: The fastest way to slow climate change now','10 dk']]},
+];
+let libCat=LS.get('libCat','bbc');
+function libVideo(id){for(const c of LIB){const x=c.v.find(v=>v[0]===id);if(x){S.vlib[id]=Object.assign({note:'',watched:null},S.vlib[id]);return Object.assign(S.vlib[id],{id,title:(c.id==='bbc'?'6 Minute English · ':'')+x[1],start:0,lib:true})}}return null}
+function renderLib(){const c=LIB.find(x=>x.id===libCat)||LIB[0];
+  $('libSeg').innerHTML=LIB.map(x=>`<button data-c="${x.id}" class="${x.id===c.id?'on':''}">${esc(x.name)}</button>`).join('');
+  document.querySelectorAll('#libSeg button').forEach(b=>b.onclick=()=>{libCat=b.dataset.c;LS.set('libCat',libCat);renderLib()});
+  const w=c.v.filter(v=>S.vlib[v[0]]?.watched).length;
+  $('libDesc').innerHTML=`<b style="color:var(--text);font-weight:600">${c.lvl}</b> · ${esc(c.desc)} <span style="white-space:nowrap">· ${w}/${c.v.length} izlendi</span>`;
+  $('libList').innerHTML=c.v.map(([id,t,len])=>{const st=S.vlib[id]||{};return `<div class="vcard${st.watched?' done':''}" data-lib="${id}"><div class="thumb"><img loading="lazy" src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt=""><span class="play">▶</span>${st.watched?'<span class="wt">✓ izlendi</span>':''}<span class="len">${len}</span></div><div class="vt" style="padding-right:0">${esc(t)}</div>${st.note?'<div class="vn">📝 not var</div>':''}</div>`}).join('');
+}
+$('libList').onclick=e=>{const c=e.target.closest('[data-lib]');if(c)openVideo(c.dataset.lib)};
 function ytId(u){u=(u||'').trim();let m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/|youtube-nocookie\.com\/embed\/)([A-Za-z0-9_-]{11})/);if(m)return m[1];if(/^[A-Za-z0-9_-]{11}$/.test(u))return u;return null}
 function ytStart(u){const m=(u||'').match(/[?&#]t=(\d+h)?(\d+m)?(\d+)s?/);if(!m)return 0;return (parseInt(m[1])||0)*3600+(parseInt(m[2])||0)*60+(parseInt(m[3])||0)}
 function renderVideos(){const V=S.videos.slice().reverse();
@@ -850,7 +879,7 @@ $('vAdd').onclick=async()=>{const url=$('vUrl').value,id=ytId(url);if(!id){toast
 $('vUrl').onkeydown=e=>{if(e.key==='Enter')$('vAdd').click()};
 $('vList').onclick=e=>{const d=e.target.closest('[data-del]');if(d){e.stopPropagation();if(!confirm('Video listeden silinsin mi?'))return;S.videos=S.videos.filter(v=>v.id!==d.dataset.del);save();renderVideos();return}
   const c=e.target.closest('.vcard');if(c)openVideo(c.dataset.id)};
-function openVideo(id){const v=S.videos.find(x=>x.id===id);if(!v)return;
+function openVideo(id){const v=S.videos.find(x=>x.id===id)||libVideo(id);if(!v)return;
   $('modalBox').innerHTML=`<header><div><div class="unit-no">Video</div><h2 style="font-size:22px!important">${esc(v.title)}</h2></div><button class="icon-btn" id="mclose">✕</button></header>
     <div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&cc_load_policy=1&cc_lang_pref=en&hl=en&modestbranding=1${v.start?'&start='+v.start:''}" title="${esc(v.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
     <p class="muted" style="font-size:13px">Altyazıyı ve hızı oynatıcının ⚙ menüsünden değiştirebilirsin. Video açılmazsa sahibi gömmeye izin vermemiştir; <a href="https://www.youtube.com/watch?v=${v.id}${v.start?'&t='+v.start+'s':''}" target="_blank" rel="noopener">YouTube'da aç ↗</a></p>
@@ -860,7 +889,7 @@ function openVideo(id){const v=S.videos.find(x=>x.id===id);if(!v)return;
   $('modal').classList.add('show');$('modal').scrollTop=0;
   const close=()=>{$('modalBox').innerHTML='';closeModal()};$('mclose').onclick=close;
   $('vNote').oninput=e=>{v.note=e.target.value;clearTimeout(v._h);v._h=setTimeout(save,400)};
-  $('vDone').onclick=()=>{if(v.watched){v.watched=null}else{v.watched=dayKey();S.listen.push({date:dayKey(),src:'video',title:v.title,score:null});logDay('listen');toast('Kaydedildi 🎧')}save();renderVideos();renderListen();renderPlan();close()};
+  $('vDone').onclick=()=>{if(v.watched){v.watched=null}else{v.watched=dayKey();S.listen.push({date:dayKey(),src:'video',title:v.title,score:null});logDay('listen');toast('Kaydedildi 🎧')}save();renderListen();renderPlan();close()};
 }
 $('lAdd').onclick=()=>{const sc=$('lScore').value===''?null:Math.max(0,Math.min(40,+$('lScore').value));
   S.listen.push({date:dayKey(),src:$('lSrc').value,title:$('lTitle').value.trim(),score:sc});logDay('listen');save();$('lTitle').value='';$('lScore').value='';toast('Kaydedildi 🎧');renderListen();renderPlan()};
