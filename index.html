@@ -14,7 +14,7 @@
 :root{
   --bg:#ffffff; --side:#fbfbfa; --panel:#ffffff; --panel2:#f7f7f5; --hover:#efefed; --line:#ebebea;
   --text:#37352f; --muted:#787774; --faint:#a5a29c;
-  --accent:#2383e2; --accent-bg:#e7f3f8; --yellow-bg:#fbf3db; --green:#448361; --green-bg:#edf3ec; --red:#d44c47;
+  --accent:#2383e2; --accent-bg:#e7f3f8; --purple-bg:#f1eaf8; --yellow-bg:#fbf3db; --green:#448361; --green-bg:#edf3ec; --red:#d44c47;
   --A1:#448361; --A2:#337ea9; --B1:#9065b0; --B2:#d9730d; --C1:#d44c47;
   --lilac:#9065b0; --sage:#448361; --rose:#d44c47; --peach:#d9730d; --butter:#dfab01;
   --serif:"Source Serif 4",Georgia,serif;
@@ -22,7 +22,7 @@
 :root[data-theme="dark"]{
   --bg:#191919; --side:#202020; --panel:#191919; --panel2:#252525; --hover:#2c2c2c; --line:#2f2f2f;
   --text:#e6e6e4; --muted:#9b9b98; --faint:#6f6f6c;
-  --accent-bg:#1f2f3a; --yellow-bg:#3a3420; --green-bg:#1f2e24;
+  --accent-bg:#1f2f3a; --purple-bg:#2f2639; --yellow-bg:#3a3420; --green-bg:#1f2e24;
   --A1:#5fa37a; --A2:#5a9bc4; --B1:#b08ad0; --B2:#e8913a; --C1:#e66a64; --lilac:#b08ad0; --sage:#5fa37a; --rose:#e66a64;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -105,6 +105,8 @@ nav.tabs{display:flex;flex-direction:column;gap:1px}
 .hl .w[data-l="B2"]{text-decoration-color:var(--B2)}
 .hl .w[data-l="C1"]{text-decoration-color:var(--C1)}
 .w.mine{background:var(--yellow-bg)}
+.phr{background:var(--purple-bg);border-bottom:2px solid var(--B1);border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.phr .w.mine{background:transparent}
 .sent{border-radius:3px;transition:background .12s;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .reading .sent:hover,.sent.focus{background:var(--accent-bg)}
 .sent.has{border-bottom:1.5px solid color-mix(in srgb,var(--green) 45%,transparent)}
@@ -632,7 +634,7 @@ async function renderReader(){
       <div class="r-actions"><button class="btn small" id="prevU" ${S.unitIdx===0?'disabled':''} title="Önceki ünite">←</button><button class="btn small" id="skipU" title="Sonraki ünite">→</button><button class="btn primary small" id="doneU">Bitirdim ✓</button></div></div>
     <div class="progress"><div style="width:${pct}%"></div></div>
     ${!data.found?'<div class="empty" style="margin-top:22px">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Sağ üstteki → ile atlayabilirsin.</div>':!data.paras.length?'<div class="empty" style="margin-top:22px">Bu ünitenin metni PDF\'ten okunamadı. Sağ üstteki → ile atlayabilirsin.</div>':`
-    ${S.hl?'<div class="legend"><span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span><span><i style="background:var(--yellow-bg);height:10px"></i>kelimelerimde</span><span style="margin-left:auto">Kelimeye tıkla: anlam ve seviye · birkaç kelime seç: kalıp ekle</span></div>':''}
+    ${S.hl?'<div class="legend"><span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span><span><i style="background:var(--yellow-bg);height:10px"></i>kelimelerim</span><span><i style="background:var(--purple-bg);height:10px;border-bottom:2px solid var(--B1)"></i>kalıplarım</span><span style="margin-left:auto">Kelimeye tıkla: anlam ve seviye · birkaç kelime seç: kalıp ekle</span></div>':''}
     <div class="cols ${S.hl?'hl':''}" id="paras">
       <div class="read-col"><div class="col-h">Okuma metni <span>${mode==='dict'?'Dikte modunda metin gizli':'Cümlenin üzerine gel, çevirini gör'}</span></div>
         <div class="lbar">${TTS.ok?`<button class="btn small" id="playAll">▶ Dinle</button><select id="rateSel" title="Hız">${[0.7,0.85,1,1.15].map(r=>`<option value="${r}" ${+LS.get('rate',0.85)===r?'selected':''}>${r}x</option>`).join('')}</select><select id="voiceSel" title="Ses"></select>`:'<span class="muted" style="font-size:13px">Bu tarayıcı sesli okumayı desteklemiyor. Chrome ya da Edge kullan.</span>'}
@@ -648,7 +650,7 @@ async function renderReader(){
       </div>
     </div>`}`;
   if($('doneU2'))$('doneU2').onclick=()=>$('doneU').click();
-  current.flat=flat;
+  current.flat=flat; markPhrases(card);
   document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{LS.set('rmode',b.dataset.m);renderReader()});
   if($('veilBtn'))$('veilBtn').onclick=()=>{const v=!LS.get('veil',true);LS.set('veil',v);$('readText').classList.toggle('veil',v);$('veilBtn').textContent=v?'Metni göster':'Metni gizle'};
   if($('playAll')){fillVoices();$('playAll').onclick=()=>{if(TTS.playing)stopTTS();else{TTS.playing=true;$('playAll').textContent='❚❚ Durdur';playFrom(flat,0)}};
@@ -759,10 +761,27 @@ function phrasePopup(text,rect,ex){
   setTimeout(()=>$('pm').focus(),20);
   const doAdd=()=>{const m=$('pm').value.trim();if(!m){toast('Bir anlam yaz');return}
     const k=text.toLowerCase();S.words[k]={w:text,m,l:null,ex,unit:(B.short+' · '+current?.u.n),box:0,due:addDays(1),added:dayKey(),phrase:true};
-    save();hidePop();updateCounts();getSelection().removeAllRanges();toast('Kalıp eklendi ✨')};
+    save();hidePop();updateCounts();getSelection().removeAllRanges();markPhrases();toast('Kalıp eklendi ✨')};
   $('padd').onclick=doAdd;$('pm').onkeydown=e=>{if(e.key==='Enter')doAdd()};
 }
-function markMine(){document.querySelectorAll('.w').forEach(s=>s.classList.toggle('mine',!!S.words[s.dataset.k]))}
+function markMine(){document.querySelectorAll('.w').forEach(s=>s.classList.toggle('mine',!!S.words[s.dataset.k]));markPhrases()}
+function markPhrases(root){
+  // unwrap old highlights
+  (root||document).querySelectorAll('.phr').forEach(el=>{const p=el.parentNode;while(el.firstChild)p.insertBefore(el.firstChild,el);p.removeChild(el)});
+  const P=Object.entries(S.words).filter(([k,v])=>v.phrase).map(([k,v])=>({k,m:v.m,t:v.w.split(/\s+/).map(normW).filter(Boolean)})).filter(x=>x.t.length>1);
+  if(!P.length)return;
+  const same=(a,b)=>a===b||(a.length>2&&b.length>2&&lemmaKey(a)===lemmaKey(b));
+  (root||document).querySelectorAll('.reading .sent, .ens .sent').forEach(sent=>{
+    const W=[...sent.querySelectorAll('.w')],N=W.map(w=>normW(w.textContent));
+    const used=new Array(W.length).fill(false),hits=[];
+    for(const ph of P.sort((a,b)=>b.t.length-a.t.length)){
+      for(let i=0;i+ph.t.length<=W.length;i++){
+        if(used.slice(i,i+ph.t.length).some(Boolean))continue;
+        if(ph.t.every((t,j)=>same(N[i+j],t))){for(let j=0;j<ph.t.length;j++)used[i+j]=true;hits.push([W[i],W[i+ph.t.length-1],ph])}
+      }}
+    for(const [a,b,ph] of hits){try{const r=document.createRange();r.setStartBefore(a);r.setEndAfter(b);const sp=document.createElement('span');sp.className='phr';sp.title=ph.m;r.surroundContents(sp)}catch(_){}}
+  });
+}
 document.addEventListener('mouseup',e=>{
   const en=e.target.closest?.('.en'); if(!en||e.target.closest('.pop'))return;
   const sel=getSelection(); const t=sel.toString().replace(/\s+/g,' ').trim();
