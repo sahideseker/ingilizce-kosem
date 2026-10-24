@@ -72,7 +72,7 @@ nav.tabs{display:flex;flex-direction:column;gap:1px}
 .btn:disabled{opacity:.4;cursor:default}
 /* plan */
 .plan{display:flex;gap:8px;flex-wrap:wrap}
-.step{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;min-width:0;flex:1 1 220px}
+.step{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;min-width:0;flex:1 1 180px}
 .step:hover{background:var(--panel2)}
 .step .ic{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--faint);flex:none;display:grid;place-items:center;font-size:0}
 .step.done .ic{background:var(--green);border-color:var(--green);font-size:11px;color:#fff}
@@ -125,6 +125,37 @@ details.qs{border:1px solid var(--line);border-radius:8px;padding:10px 14px;marg
 details.qs summary{cursor:pointer;font-weight:500;font-size:14px}
 details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;line-height:1.7;margin-top:10px}
 .reader-actions{display:flex;justify-content:flex-end;margin-top:22px}
+.lbar{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.lbar select{max-width:190px;font-size:13px;padding:4px 6px}
+.sent.speaking{background:var(--yellow-bg)!important}
+.reading.veil{filter:blur(6px);user-select:none;transition:filter .2s}
+.reading.veil:hover{filter:blur(5px)}
+.dline{display:flex;gap:6px;align-items:center}
+.dline input{flex:1;min-width:0;font:inherit;font-size:15px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--text)}
+.dline input:focus{outline:2px solid var(--accent-bg);border-color:var(--accent)}
+.spk{background:var(--panel);border:1px solid var(--line);border-radius:6px;width:34px;height:32px;cursor:pointer;font-size:15px;flex:none}
+.spk:hover,.spk.on{background:var(--accent-bg);border-color:var(--accent)}
+.dres{margin-top:6px}
+.dres:empty{display:none}
+.dsc{font-size:12px;font-weight:600;display:inline-block;padding:1px 7px;border-radius:4px;margin-bottom:4px}
+.dsc.full{background:var(--green-bg);color:var(--green)}.dsc.good{background:var(--accent-bg);color:var(--accent)}.dsc.low{background:#fbe4e4;color:var(--red)}
+:root[data-theme="dark"] .dsc.low{background:#3a2222}
+.dorig{font-family:var(--serif);font-size:15.5px;line-height:1.6}
+.dorig .miss{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.dtyped{font-size:13.5px;color:var(--muted);margin-top:2px}
+.dtyped .wrong{color:var(--red);text-decoration:line-through}
+.drow.done .no{color:var(--green)}
+/* listening */
+.week{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.week .bar{flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden}.week .bar div{height:100%;background:var(--green)}
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.rcard{border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.rcard b{font-weight:600}.rcard p{font-size:13.5px;color:var(--muted);flex:1}
+.rcard .meta{font-size:12px;color:var(--faint)}
+.rcard a{align-self:flex-start;text-decoration:none}
+.lform{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lform input{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--text)}
+.tips{margin:0 0 0 20px;font-size:14.5px;line-height:1.8}
 /* popup */
 .pop{position:absolute;z-index:20;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 32px -10px rgba(0,0,0,.25);padding:14px;width:300px;display:none}
 .pop.show{display:block}
@@ -223,6 +254,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     <button class="tab" data-v="review"><span class="i">↻</span>Tekrar<span class="badge" id="dueBadge" hidden>0</span></button>
     <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim</button>
     <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
+    <button class="tab" data-v="listen"><span class="i">♪</span>Dinleme</button>
     <button class="tab" data-v="setup"><span class="i">⚙</span>Ayarlar</button>
   </nav>
   <div id="unitsCard" hidden style="display:contents">
@@ -241,6 +273,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
         <div class="step" id="stG"><div class="ic"></div><div><b>Gramer konusu</b><span id="stGt">–</span></div></div>
         <div class="step" id="stR"><div class="ic"></div><div><b>Metin çevirisi</b><span id="stRt">–</span></div></div>
         <div class="step" id="stV"><div class="ic"></div><div><b>Kelime tekrarı</b><span id="stVt">–</span></div></div>
+        <div class="step" id="stL"><div class="ic"></div><div><b>Dinleme</b><span id="stLt">–</span></div></div>
       </div>
     </div>
     <div class="card" id="readerCard">
@@ -280,6 +313,22 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     <div class="card">
       <div class="glist" id="glist"></div>
     </div>
+  </section>
+
+  <!-- LISTEN -->
+  <section class="view" id="v-listen">
+    <div class="page-h"><h1>Dinleme</h1><p>Her gün okuma ekranında <b>Dikte</b> modunu kullan; haftada birkaç kez de aşağıdaki kaynaklardan gerçek İngilizce dinle.</p></div>
+    <div class="card"><div class="week" id="weekBox"></div></div>
+    <div class="card"><h2>Kaynaklar</h2><div class="res" id="resList"></div></div>
+    <div class="card"><h2>Dinledim</h2>
+      <div class="lform"><select id="lSrc"></select><input id="lTitle" placeholder="Bölüm ya da konu adı (isteğe bağlı)" style="flex:1;min-width:200px"><input id="lScore" type="number" min="0" max="40" placeholder="Puan /40" style="width:110px" title="IELTS testi çözdüysen doğru sayın"><button class="btn primary" id="lAdd">Dinledim ✓</button></div>
+      <div class="wlist" id="lLog" style="margin-top:12px"></div></div>
+    <div class="card"><h2>Nasıl dinlemeli?</h2><ol class="tips">
+      <li>İlk dinleyişte transkripte bakma; ana fikri ve anahtar kelimeleri not al.</li>
+      <li>İkinci dinleyişte transkripti aç; kaçırdığın yerleri işaretle, neden kaçırdığını düşün (bağlanan sesler mi, bilinmeyen kelime mi?).</li>
+      <li>Kaçırdığın 2–3 cümleyi durdurarak sesli tekrar et (shadowing). Telaffuz ve speaking için de çok iyi.</li>
+      <li>IELTS testlerinde yanlışlarını kontrol et: yazım hatası mı, tekil/çoğul mu, yanlış cevap mı? Ayrı ayrı say.</li>
+    </ol></div>
   </section>
 
   <!-- SETUP -->
@@ -347,8 +396,9 @@ function prepState(){
   S.books=S.books||{};
   if(!S.books.r1){S.books.r1={unitIdx:S.unitIdx||0,doneU:S.doneU||{},st:S.st||{}}}
   delete S.unitIdx;delete S.doneU;delete S.st;
-  for(const b of BOOKS) S.books[b.id]=Object.assign({unitIdx:0,doneU:{},st:{}},S.books[b.id]);
-  for(const k of ['unitIdx','doneU','st']) Object.defineProperty(S,k,{get(){return S.books[S.book||'r1'][k]},set(v){S.books[S.book||'r1'][k]=v},enumerable:false,configurable:true});
+  for(const b of BOOKS) S.books[b.id]=Object.assign({unitIdx:0,doneU:{},st:{},dict:{}},S.books[b.id]);
+  S.listen=S.listen||[]; S.listenGoal=S.listenGoal||3;
+  for(const k of ['unitIdx','doneU','st','dict']) Object.defineProperty(S,k,{get(){return S.books[S.book||'r1'][k]},set(v){S.books[S.book||'r1'][k]=v},enumerable:false,configurable:true});
   setBook(S.book||'r1',true);
 }
 function setBook(id,silent){S.book=id;B=BOOKS.find(b=>b.id===id)||BOOKS[0];UNITS=B.units;
@@ -503,7 +553,8 @@ async function renderReader(){
   card.innerHTML=`<div class="loading">Ünite ${u.n} hazırlanıyor…</div>`;
   let data; try{data=await unitText(S.unitIdx)}catch(e){card.innerHTML='<div class="empty">PDF okunamadı. Ayarlar\'dan tekrar yüklemeyi dene.</div>';return}
   current={u,data};
-  S.st=S.st||{}; const st=S.st[u.n]||{}; const old=S.trans[u.n]||{};
+  stopTTS(); S.st=S.st||{}; const st=S.st[u.n]||{}; const old=S.trans[u.n]||{};
+  const mode=LS.get('rmode','tr'), veil=LS.get('veil',true); S.dict=S.dict||{}; const dct=S.dict[u.n]||{};
   const sents=data.paras.map(p=>splitSentences(p)); const flat=[];sents.forEach((ss,i)=>ss.forEach((x,j)=>flat.push({id:i+'.'+j,t:x})));
   const pct=Math.round(S.unitIdx/UNITS.length*100);
   const nDone=flat.filter(f=>(st[f.id]||'').trim()).length;
@@ -514,16 +565,32 @@ async function renderReader(){
     ${!data.found?'<div class="empty" style="margin-top:22px">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Sağ üstteki → ile atlayabilirsin.</div>':!data.paras.length?'<div class="empty" style="margin-top:22px">Bu ünitenin metni PDF\'ten okunamadı. Sağ üstteki → ile atlayabilirsin.</div>':`
     ${S.hl?'<div class="legend"><span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span><span><i style="background:var(--yellow-bg);height:10px"></i>kelimelerimde</span><span style="margin-left:auto">Kelimeye tıkla: anlam ve seviye · birkaç kelime seç: kalıp ekle</span></div>':''}
     <div class="cols ${S.hl?'hl':''}" id="paras">
-      <div class="read-col"><div class="col-h">Okuma metni <span>Cümlenin üzerine gel, çevirini gör</span></div>
-        <div class="reading en" id="readText">${sents.map((ss,i)=>`<p>${ss.map((x,j)=>`<span class="sent${(st[i+'.'+j]||'').trim()?' has':''}" data-id="${i}.${j}">${wrapWords(x)}</span>`).join(' ')}</p>`).join('')}</div>
+      <div class="read-col"><div class="col-h">Okuma metni <span>${mode==='dict'?'Dikte modunda metin gizli':'Cümlenin üzerine gel, çevirini gör'}</span></div>
+        <div class="lbar">${TTS.ok?`<button class="btn small" id="playAll">▶ Dinle</button><select id="rateSel" title="Hız">${[0.7,0.85,1,1.15].map(r=>`<option value="${r}" ${+LS.get('rate',0.85)===r?'selected':''}>${r}x</option>`).join('')}</select><select id="voiceSel" title="Ses"></select>`:'<span class="muted" style="font-size:13px">Bu tarayıcı sesli okumayı desteklemiyor. Chrome ya da Edge kullan.</span>'}
+          ${mode==='dict'?`<button class="btn small" id="veilBtn" style="margin-left:auto">${veil?'Metni göster':'Metni gizle'}</button>`:''}</div>
+        <div class="reading en${mode==='dict'&&veil?' veil':''}" id="readText">${sents.map((ss,i)=>`<p>${ss.map((x,j)=>`<span class="sent${(st[i+'.'+j]||'').trim()?' has':''}" data-id="${i}.${j}">${wrapWords(x)}</span>`).join(' ')}</p>`).join('')}</div>
         ${data.questions?`<details class="qs"><summary>Ünitenin soruları</summary><pre>${esc(data.questions)}</pre></details>`:''}
       </div>
-      <div><div class="col-h">Cümle cümle çeviri <span id="sCount">${nDone} / ${flat.length}</span></div>
-        <div class="slist">${flat.map((f,n)=>`<div class="srow${(st[f.id]||'').trim()?' done':''}" data-id="${f.id}"><div class="no">${n+1}</div><div><div class="ens en"><span class="sent" data-id="${f.id}">${wrapWords(f.t)}</span></div><textarea rows="1" data-id="${f.id}" placeholder="Türkçesi…">${esc(st[f.id]||'')}</textarea></div></div>`).join('')}</div>
+      <div><div class="col-h"><div class="seg" id="modeSeg"><button data-m="tr" class="${mode==='tr'?'on':''}">Çeviri</button><button data-m="dict" class="${mode==='dict'?'on':''}">Dikte</button></div><span id="sCount">${mode==='tr'?`${nDone} / ${flat.length}`:dictSummary(dct,flat)}</span></div>
+        ${mode==='tr'?`<div class="slist">${flat.map((f,n)=>`<div class="srow${(st[f.id]||'').trim()?' done':''}" data-id="${f.id}"><div class="no">${n+1}</div><div><div class="ens en"><span class="sent" data-id="${f.id}">${wrapWords(f.t)}</span></div><textarea rows="1" data-id="${f.id}" placeholder="Türkçesi…">${esc(st[f.id]||'')}</textarea></div></div>`).join('')}</div>`
+        :`<p class="muted" style="font-size:13px;margin-bottom:8px">🔊 ile cümleyi dinle (istediğin kadar), duyduğunu yaz, Enter ile kontrol et. Noktalama ve büyük harf önemli değil.</p>
+        <div class="slist">${flat.map((f,n)=>{const r=dct[f.id];return `<div class="srow drow${r?' done':''}" data-id="${f.id}"><div class="no">${n+1}</div><div><div class="dline"><button class="spk" data-id="${f.id}" title="Dinle">🔊</button><input data-id="${f.id}" placeholder="Duyduğunu yaz…" value="${esc(r?r.t:'')}" autocomplete="off" spellcheck="false"><button class="btn small chk" data-id="${f.id}">Kontrol</button></div><div class="dres">${r?dictHtml(f.t,r.t):''}</div></div></div>`}).join('')}</div>`}
         <div class="reader-actions"><button class="btn primary" id="doneU2">Üniteyi bitirdim ✓</button></div>
       </div>
     </div>`}`;
   if($('doneU2'))$('doneU2').onclick=()=>$('doneU').click();
+  current.flat=flat;
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{LS.set('rmode',b.dataset.m);renderReader()});
+  if($('veilBtn'))$('veilBtn').onclick=()=>{const v=!LS.get('veil',true);LS.set('veil',v);$('readText').classList.toggle('veil',v);$('veilBtn').textContent=v?'Metni göster':'Metni gizle'};
+  if($('playAll')){fillVoices();$('playAll').onclick=()=>{if(TTS.playing)stopTTS();else{TTS.playing=true;$('playAll').textContent='❚❚ Durdur';playFrom(flat,0)}};
+    $('rateSel').onchange=e=>LS.set('rate',+e.target.value);$('voiceSel').onchange=e=>LS.set('voice',e.target.value)}
+  card.querySelectorAll('.spk').forEach(b=>b.onclick=()=>{stopTTS();const f=flat.find(x=>x.id===b.dataset.id);b.classList.add('on');say(f.t,()=>b.classList.remove('on'));b.parentElement.querySelector('input').focus()});
+  const check=id=>{const inp=card.querySelector(`.drow input[data-id="${id}"]`),f=flat.find(x=>x.id===id);if(!inp.value.trim()){toast('Önce duyduğunu yaz');return}
+    S.dict[u.n]=S.dict[u.n]||{};S.dict[u.n][id]={t:inp.value,s:diffWords(f.t,inp.value).score};save();logDay('listen');
+    const row=inp.closest('.drow');row.classList.add('done');row.querySelector('.dres').innerHTML=dictHtml(f.t,inp.value);$('sCount').textContent=dictSummary(S.dict[u.n],flat);renderPlan();
+    const nx=row.nextElementSibling;if(nx){const ni=nx.querySelector('input');ni.focus();nx.querySelector('.spk').click()}};
+  card.querySelectorAll('.drow .chk').forEach(b=>b.onclick=()=>check(b.dataset.id));
+  card.querySelectorAll('.drow input').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();check(i.dataset.id)}else if(e.key==='Escape'||(e.ctrlKey&&e.key===' ')){e.preventDefault();i.closest('.dline').querySelector('.spk').click()}});
   const fit=t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'};
   const focusSent=(id,on)=>{document.querySelectorAll(`#readText .sent[data-id="${id}"]`).forEach(x=>x.classList.toggle('focus',on))};
   card.querySelectorAll('.srow textarea').forEach(t=>{const id=t.dataset.id,row=t.closest('.srow');setTimeout(()=>fit(t),20);
@@ -536,7 +603,7 @@ async function renderReader(){
   });
   card.querySelectorAll('.srow').forEach(r=>{r.onmouseenter=()=>focusSent(r.dataset.id,true);r.onmouseleave=()=>{if(!r.classList.contains('focus'))focusSent(r.dataset.id,false)}});
   const rt=$('readText');
-  if(rt){rt.addEventListener('mouseover',e=>{const se=e.target.closest('.sent');if(!se)return;showTip(se,(S.st[u.n]||{})[se.dataset.id])});
+  if(rt&&mode==='tr'){rt.addEventListener('mouseover',e=>{const se=e.target.closest('.sent');if(!se)return;showTip(se,(S.st[u.n]||{})[se.dataset.id])});
     rt.addEventListener('mouseleave',hideTip);
     rt.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest?.('.sent'))hideTip()});}
   $('prevU').onclick=()=>{S.unitIdx--;save();renderReader();syncUnitSel()};
@@ -546,6 +613,40 @@ async function renderReader(){
     if(data.paras.length&&!filled&&!confirm('Hiç çeviri yazmadın. Yine de bitti sayılsın mı?'))return;
     S.doneU=S.doneU||{};S.doneU[u.n]=dayKey();logDay('read');S.unitIdx++;save();toast(`Ünite ${u.n} tamam 🌿`);renderReader();renderPlan();syncUnitSel();window.scrollTo({top:0,behavior:'smooth'})};
 }
+/* ---------- speech ---------- */
+const TTS={ok:'speechSynthesis' in window,playing:false,voices:[]};
+function loadVoices(){if(!TTS.ok)return;TTS.voices=speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang)||v.lang==='en');fillVoices()}
+if(TTS.ok){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function pickVoice(){const n=LS.get('voice','');const V=TTS.voices;
+  return V.find(v=>v.name===n)||V.find(v=>/en.GB/i.test(v.lang)&&/Google|Natural|Sonia|Libby|Daniel|Serena|Kate|Arthur/i.test(v.name))||V.find(v=>/en.GB/i.test(v.lang))||V.find(v=>/en.US/i.test(v.lang)&&/Google|Natural/i.test(v.name))||V[0]}
+function fillVoices(){const sel=document.getElementById('voiceSel');if(!sel||!TTS.voices.length)return;const cur=pickVoice();
+  const order=v=>(/en.GB/i.test(v.lang)?0:/en.US/i.test(v.lang)?1:2);
+  sel.innerHTML=TTS.voices.slice().sort((a,b)=>order(a)-order(b)||a.name.localeCompare(b.name)).map(v=>`<option value="${esc(v.name)}" ${cur&&v.name===cur.name?'selected':''}>${esc(v.name.replace(/Microsoft |Google | Online \(Natural\)/g,''))} · ${v.lang.replace('_','-')}</option>`).join('')}
+function say(text,onend){const u=new SpeechSynthesisUtterance(text.replace(/\s+/g,' '));const v=pickVoice();if(v){u.voice=v;u.lang=v.lang}else u.lang='en-GB';
+  u.rate=+LS.get('rate',0.85);let done=false;const fin=()=>{if(!done){done=true;onend&&onend()}};u.onend=fin;u.onerror=fin;speechSynthesis.speak(u)}
+function stopTTS(){TTS.playing=false;if(TTS.ok)speechSynthesis.cancel();document.querySelectorAll('.sent.speaking').forEach(x=>x.classList.remove('speaking'));const b=document.getElementById('playAll');if(b)b.textContent='▶ Dinle'}
+function playFrom(list,i){if(!TTS.playing)return;document.querySelectorAll('.sent.speaking').forEach(x=>x.classList.remove('speaking'));
+  if(i>=list.length){stopTTS();return}
+  const se=document.querySelector(`#readText .sent[data-id="${list[i].id}"]`);if(se){se.classList.add('speaking');const col=se.closest('.read-col');
+    if(col&&col.scrollHeight>col.clientHeight){const r=se.getBoundingClientRect(),c=col.getBoundingClientRect();if(r.top<c.top+40||r.bottom>c.bottom-20)col.scrollTo({top:col.scrollTop+r.top-c.top-c.height/3,behavior:'smooth'})}}
+  say(list[i].t,()=>{if(TTS.playing)setTimeout(()=>playFrom(list,i+1),250)})}
+const normW=w=>w.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9']/g,'').replace(/^'+|'+$/g,'');
+function diffWords(orig,typed){
+  const O=orig.split(/\s+/).filter(Boolean),T=typed.split(/\s+/).filter(Boolean),on=O.map(normW),tn=T.map(normW);
+  const n=O.length,m=T.length,dp=Array.from({length:n+1},()=>new Int16Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=on[i]&&on[i]===tn[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const om=new Array(n).fill(false),tm=new Array(m).fill(false);let i=0,j=0;
+  while(i<n&&j<m){if(on[i]&&on[i]===tn[j]){om[i]=tm[j]=true;i++;j++}else if(dp[i+1][j]>=dp[i][j+1])i++;else j++}
+  on.forEach((w,k)=>{if(!w)om[k]=true});tn.forEach((w,k)=>{if(!w)tm[k]=true});
+  const real=on.filter(Boolean).length||1,hit=om.filter((x,k)=>x&&on[k]).length;
+  return{score:hit/real,O,T,om,tm};
+}
+function dictHtml(orig,typed){const d=diffWords(orig,typed);const pct=Math.round(d.score*100);
+  return `<div class="dsc ${pct===100?'full':pct>=80?'good':'low'}">${pct===100?'Tam isabet ✓':pct+'%'}</div>
+    <div class="dorig">${d.O.map((w,k)=>d.om[k]?esc(w):`<span class="miss">${esc(w)}</span>`).join(' ')}</div>
+    ${pct<100?`<div class="dtyped">${d.T.map((w,k)=>d.tm[k]?esc(w):`<span class="wrong">${esc(w)}</span>`).join(' ')}</div>`:''}`}
+function dictSummary(dct,flat){const v=flat.map(f=>dct[f.id]).filter(Boolean);if(!v.length)return `0 / ${flat.length}`;
+  return `${v.length} / ${flat.length} · ort. %${Math.round(v.reduce((a,b)=>a+b.s,0)/v.length*100)}`}
 function showTip(se,t){const tip=$('stip');tip.textContent=t&&t.trim()?t:'Bu cümleyi henüz çevirmedin';tip.classList.toggle('empty',!(t&&t.trim()));
   const r=se.getClientRects()[0]||se.getBoundingClientRect();tip.classList.add('show');
   const w=Math.min(440,document.documentElement.clientWidth-16);tip.style.maxWidth=w+'px';
@@ -691,6 +792,29 @@ function openGrammar(i){
 function closeModal(){$('modal').classList.remove('show')}
 $('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 
+/* ---------- listening tab ---------- */
+const RES=[
+ {id:'bbc',name:'BBC Learning English · 6 Minute English',desc:'İki sunucunun güncel bir konu üzerine 6 dakikalık sohbeti. Doğal İngiliz konuşması, transkript ve kelime listesi var.',when:'Haftada 2–3 kez',url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english'},
+ {id:'bcb2',name:'British Council · B2 Listening',desc:'Seviyeye göre kısa dinlemeler; her birinin alıştırması ve transkripti var. Reader 1 bitince C1\'e de geçebilirsin.',when:'Haftada 1–2 kez',url:'https://learnenglish.britishcouncil.org/free-resources/listening/b2'},
+ {id:'bcaudio',name:'British Council · Audio zone',desc:'Farklı konularda podcast ve sesli içerikler. Rahat dinleme ve kulak alışkanlığı için.',when:'Canın istedikçe',url:'https://learnenglish.britishcouncil.org/general-english/audio-zone'},
+ {id:'ielts',name:'British Council · Ücretsiz IELTS Listening testleri',desc:'Gerçek sınav formatında 4 bölümlük testler. Süre tutarak çöz, puanını /40 olarak kaydet.',when:'2 haftada bir',url:'https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-listening-practice-tests'},
+];
+const weekStart=()=>{const d=new Date();const k=(d.getDay()+6)%7;d.setDate(d.getDate()-k);return dayKey(d)};
+function renderListen(){
+  const ws=weekStart(),wk=S.listen.filter(x=>x.date>=ws).length,dictDays=Object.entries(S.log).filter(([d,v])=>d>=ws&&v.listen).length;
+  $('weekBox').innerHTML=`<div><b style="font-size:20px">${wk} / ${S.listenGoal}</b><div class="muted" style="font-size:13px">bu hafta gerçek dinleme</div></div><div class="bar"><div style="width:${Math.min(100,wk/S.listenGoal*100)}%"></div></div>
+    <div style="text-align:right"><b style="font-size:20px">${dictDays}</b><div class="muted" style="font-size:13px">gün dikte</div></div>
+    <select id="goalSel" title="Haftalık hedef">${[2,3,4,5,7].map(n=>`<option value="${n}" ${n===S.listenGoal?'selected':''}>Hedef: ${n}</option>`).join('')}</select>`;
+  $('goalSel').onchange=e=>{S.listenGoal=+e.target.value;save();renderListen()};
+  $('resList').innerHTML=RES.map(r=>`<div class="rcard"><b>${esc(r.name)}</b><p>${esc(r.desc)}</p><div class="meta">${esc(r.when)}</div><a class="btn small" href="${r.url}" target="_blank" rel="noopener">Aç ↗</a></div>`).join('');
+  $('lSrc').innerHTML=RES.map(r=>`<option value="${r.id}">${esc(r.name.split(' · ')[1]||r.name)}</option>`).join('')+'<option value="other">Başka bir kaynak</option>';
+  const L=S.listen.slice().reverse();
+  $('lLog').innerHTML=L.length?L.map(x=>{const r=RES.find(r=>r.id===x.src);return `<div class="wrow" style="grid-template-columns:110px 1fr auto auto"><span class="muted">${new Date(x.date).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}</span><span><b style="font-weight:600">${esc(r?r.name.split(' · ')[1]||r.name:'Başka kaynak')}</b>${x.title?' · '+esc(x.title):''}</span><span>${x.score!=null?`<b>${x.score}</b>/40`:''}</span><button class="del" data-i="${S.listen.indexOf(x)}">×</button></div>`}).join(''):'<div class="empty">Henüz kayıt yok. Bir kaynak dinleyince buraya ekle.</div>';
+}
+$('lAdd').onclick=()=>{const sc=$('lScore').value===''?null:Math.max(0,Math.min(40,+$('lScore').value));
+  S.listen.push({date:dayKey(),src:$('lSrc').value,title:$('lTitle').value.trim(),score:sc});logDay('listen');save();$('lTitle').value='';$('lScore').value='';toast('Kaydedildi 🎧');renderListen();renderPlan()};
+$('lLog').onclick=e=>{const b=e.target.closest('.del');if(!b||!confirm('Bu kayıt silinsin mi?'))return;S.listen.splice(+b.dataset.i,1);save();renderListen()};
+
 /* ---------- plan, streak, counts ---------- */
 function renderPlan(){
   const t=S.log[dayKey()]||{};const ni=nextGrammar();
@@ -702,6 +826,8 @@ function renderPlan(){
   const due=dueList().length;
   $('stV').classList.toggle('done',due===0&&!!t.rev);
   $('stVt').textContent=due?`${due} kart bekliyor`:(t.rev?'Tekrar tamam':'Bugün kart yok');
+  $('stL').classList.toggle('done',!!t.listen);
+  $('stLt').textContent=t.listen?'Bugün dinledin':'Dikte ya da bir kaynak';
   // streak: days with reading
   let n=0;const d=new Date();if(!(S.log[dayKey(d)]||{}).read)d.setDate(d.getDate()-1);
   while((S.log[dayKey(d)]||{}).read){n++;d.setDate(d.getDate()-1)}
@@ -714,10 +840,12 @@ function updateCounts(){
 $('stG').onclick=()=>{const ni=nextGrammar();if(ni>=0)openGrammar(ni)};
 $('stR').onclick=()=>$('readerCard').scrollIntoView({behavior:'smooth'});
 $('stV').onclick=()=>go('review');
+$('stL').onclick=()=>{LS.set('rmode','dict');renderReader();setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth'}),100)};
 
 /* ---------- tabs ---------- */
 function go(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='v-'+v));
+  stopTTS(); if(v==='listen')renderListen();
   if(v==='review'){queue=[];renderReview()} if(v==='words')renderWords(); if(v==='grammar')renderGrammar(); if(v==='setup')renderSetup(); hidePop()}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
 
