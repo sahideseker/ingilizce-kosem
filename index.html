@@ -75,6 +75,24 @@ nav.tabs{display:flex;gap:6px;background:var(--panel2);padding:6px;border-radius
 .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:700;align-items:center}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:3px}
 .paras{display:grid;gap:14px;margin-top:14px}
+.sec-t{font-family:"Fraunces",serif;font-weight:500;font-size:17px;margin:18px 0 10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sec-t small{font-family:"Nunito";font-size:13px;font-weight:800;color:var(--muted)}
+.reading{font-family:"Lora",Georgia,serif;font-size:18px;line-height:1.95;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 24px}
+.reading p{margin:0 0 14px}.reading p:last-child{margin:0}
+.sent{border-radius:6px;transition:background .15s;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.reading .sent:hover,.sent.focus{background:color-mix(in srgb,var(--lilac) 22%,transparent)}
+.sent.has{border-bottom:2px dotted color-mix(in srgb,var(--sage) 70%,transparent)}
+.stip{position:absolute;z-index:15;max-width:440px;background:#4a3f52;color:#fff;font-size:14.5px;line-height:1.55;padding:10px 14px;border-radius:14px;box-shadow:0 14px 30px -12px rgba(40,20,50,.5);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.stip.show{opacity:1;transform:none}
+.stip.empty{background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.slist{display:grid;gap:10px}
+.srow{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;background:var(--panel2);border-radius:16px;padding:12px 14px;border:2px solid transparent;transition:border-color .15s}
+.srow.focus{border-color:var(--lilac);background:var(--panel)}
+.srow .no{font-weight:800;color:var(--muted);font-size:13px;padding-top:3px}
+.srow .ens{font-family:"Lora",serif;font-size:16px;line-height:1.7;margin-bottom:6px;background:none;border:none;padding:0;border-radius:0}
+.srow textarea{width:100%;font:inherit;font-size:15px;line-height:1.6;background:transparent;border:none;border-top:1px dashed var(--line);padding:8px 0 2px;color:var(--text);resize:none;overflow:hidden;min-height:34px}
+.srow textarea:focus{outline:none}
+.srow.done .no{color:#5f9f72}.srow.done .no::after{content:" ✓"}
 .para{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 @media(max-width:820px){.para{grid-template-columns:1fr}}
 .en{font-family:"Lora",Georgia,serif;font-size:17px;line-height:1.85;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
@@ -276,7 +294,7 @@ input[type=file]{display:none}
   </section>
 </div>
 
-<div class="pop" id="pop"></div>
+<div class="pop" id="pop"></div><div class="stip" id="stip"></div>
 <div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -410,6 +428,20 @@ function wrapWords(t){
     const o=lookup(m); const k=o?o.key:candidates(m)[0];
     return `<span class="w${S.words[k]?' mine':''}" data-k="${esc(k)}"${o?` data-l="${o.l}"`:''}>${esc(m)}</span>`}).join('');
 }
+const ABBR=/\b(Mr|Mrs|Ms|Dr|St|Prof|Jr|Sr|vs|etc|e\.g|i\.e|No|Co|Ltd|Inc|Ave|Rd|U\.S|U\.K|a\.m|p\.m|[A-Z])\.$/;
+function splitSentences(p){
+  const parts=[];let cur='';
+  const toks=p.split(/(\s+)/);
+  for(let i=0;i<toks.length;i++){cur+=toks[i];
+    const t=toks[i];
+    if(/[.!?]["'’”)]*$/.test(t)&&!ABBR.test(t.replace(/["'’”)]+$/,''))){
+      const nx=(toks[i+2]||'');
+      if(!nx||/^["'‘“(]?[A-Z0-9]/.test(nx)){parts.push(cur.trim());cur=''}}}
+  if(cur.trim())parts.push(cur.trim());
+  // merge very short fragments
+  const out=[];for(const x of parts){if(out.length&&x.length<12)out[out.length-1]+=' '+x;else out.push(x)}
+  return out;
+}
 async function renderReader(){
   const card=$('readerCard');
   const has=await getFile('reader');
@@ -420,33 +452,58 @@ async function renderReader(){
   card.innerHTML=`<div class="loading">Ünite ${u.n} hazırlanıyor…</div>`;
   let data; try{data=await unitText(S.unitIdx)}catch(e){card.innerHTML='<div class="empty">PDF okunamadı. Ayarlar\'dan tekrar yüklemeyi dene.</div>';return}
   current={u,data};
-  const tr=S.trans[u.n]||{};
+  S.st=S.st||{}; const st=S.st[u.n]||{}; const old=S.trans[u.n]||{};
+  const sents=data.paras.map(p=>splitSentences(p)); const flat=[];sents.forEach((ss,i)=>ss.forEach((x,j)=>flat.push({id:i+'.'+j,t:x})));
   const pct=Math.round(S.unitIdx/UNITS.length*100);
+  const nDone=flat.filter(f=>(st[f.id]||'').trim()).length;
   card.innerHTML=`
     <div class="unit-head"><div><div class="unit-no">ÜNİTE ${u.n} / 204</div><h2>${esc(u.t)}</h2></div>
       <div class="legend">${S.hl?'<span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span>':''}<span><i style="background:var(--sage);height:10px;opacity:.5"></i>kelimelerimde</span></div></div>
     <div class="progress"><div style="width:${pct}%"></div></div>
-    <p class="muted" style="font-size:13px">Bir kelimeye tıkla: anlamını ve seviyesini gör, listene ekle. Birkaç kelimeyi fareyle seçersen kalıp olarak eklersin.</p>
-    <div class="paras ${S.hl?'hl':''}" id="paras">
-      ${!data.found?'<div class="empty">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Sayfa görüntüsüne bakabilir ya da atlayabilirsin.</div>':data.paras.length?data.paras.map((p,i)=>`<div class="para"><div class="en" data-i="${i}">${wrapWords(p)}</div><textarea class="tr" data-i="${i}" placeholder="Türkçe çevirin…">${esc(tr[i]||'')}</textarea></div>`).join(''):'<div class="empty">Bu ünitenin metni PDF\'ten okunamadı. Aşağıdan sayfa görüntüsüne bakabilirsin.</div>'}
-    </div>
+    ${!data.found?'<div class="empty">Bu ünite taranmış PDF\'te bulunamadı (bazı sayfalar eksik ya da okunamıyor). Sayfa görüntüsüne bakabilir ya da atlayabilirsin.</div>':!data.paras.length?'<div class="empty">Bu ünitenin metni PDF\'ten okunamadı. Aşağıdan sayfa görüntüsüne bakabilirsin.</div>':`
+    <div id="paras" class="${S.hl?'hl':''}">
+      <div class="sec-t">📖 Okuma metni <small>Önce baştan sona oku · cümlenin üzerine gelince çevirini görürsün</small></div>
+      <div class="reading en" id="readText">${sents.map((ss,i)=>`<p>${ss.map((x,j)=>`<span class="sent${(st[i+'.'+j]||'').trim()?' has':''}" data-id="${i}.${j}">${wrapWords(x)}</span>`).join(' ')}</p>`).join('')}</div>
+      <div class="sec-t">✍️ Cümle cümle çeviri <small id="sCount">${nDone} / ${flat.length} cümle</small></div>
+      ${Object.values(old).some(v=>v&&v.trim())?`<details class="qs" style="margin:0 0 10px"><summary>Eski paragraf çevirilerin</summary><pre>${esc(Object.values(old).filter(v=>v.trim()).join('\n\n'))}</pre></details>`:''}
+      <div class="slist">${flat.map((f,n)=>`<div class="srow${(st[f.id]||'').trim()?' done':''}" data-id="${f.id}"><div class="no">${n+1}</div><div><div class="ens en"><span class="sent" data-id="${f.id}">${wrapWords(f.t)}</span></div><textarea rows="1" data-id="${f.id}" placeholder="Türkçesi…">${esc(st[f.id]||'')}</textarea></div></div>`).join('')}</div>
+    </div>`}
     ${data.questions?`<details class="qs"><summary>❓ Ünitenin soruları</summary><pre>${esc(data.questions)}</pre></details>`:''}
     <details class="qs" id="imgDet"><summary>🖼️ Sayfanın orijinal görüntüsü</summary><div class="pageimg" id="pageimg"></div></details>
     <div class="reader-actions">
       <div style="display:flex;gap:8px"><button class="btn small" id="prevU" ${S.unitIdx===0?'disabled':''}>← Önceki</button><button class="btn small" id="skipU">Atla →</button></div>
       <button class="btn primary" id="doneU">Üniteyi bitirdim ✓</button>
     </div>`;
-  card.querySelectorAll('.tr').forEach(t=>{t.oninput=()=>{S.trans[u.n]=S.trans[u.n]||{};S.trans[u.n][t.dataset.i]=t.value;clearTimeout(t._h);t._h=setTimeout(save,400)};
-    const fit=()=>{t.style.height='auto';t.style.height=Math.max(t.scrollHeight,t.previousElementSibling.offsetHeight)+'px'};setTimeout(fit,30)});
+  const fit=t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'};
+  const focusSent=(id,on)=>{document.querySelectorAll(`#readText .sent[data-id="${id}"]`).forEach(x=>x.classList.toggle('focus',on))};
+  card.querySelectorAll('.srow textarea').forEach(t=>{const id=t.dataset.id,row=t.closest('.srow');setTimeout(()=>fit(t),20);
+    t.oninput=()=>{fit(t);S.st[u.n]=S.st[u.n]||{};S.st[u.n][id]=t.value;const has=!!t.value.trim();row.classList.toggle('done',has);
+      document.querySelector(`#readText .sent[data-id="${id}"]`)?.classList.toggle('has',has);
+      $('sCount').textContent=`${Object.values(S.st[u.n]).filter(v=>v.trim()).length} / ${flat.length} cümle`;clearTimeout(t._h);t._h=setTimeout(save,400)};
+    t.onfocus=()=>{row.classList.add('focus');focusSent(id,true)};t.onblur=()=>{row.classList.remove('focus');focusSent(id,false)};
+    t.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();const nx=row.nextElementSibling?.querySelector('textarea');if(nx)nx.focus();else $('doneU').focus()}};
+  });
+  card.querySelectorAll('.srow').forEach(r=>{r.onmouseenter=()=>focusSent(r.dataset.id,true);r.onmouseleave=()=>{if(!r.classList.contains('focus'))focusSent(r.dataset.id,false)}});
+  const rt=$('readText');
+  if(rt){rt.addEventListener('mouseover',e=>{const se=e.target.closest('.sent');if(!se)return;showTip(se,(S.st[u.n]||{})[se.dataset.id])});
+    rt.addEventListener('mouseleave',hideTip);
+    rt.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest?.('.sent'))hideTip()});}
   $('imgDet').ontoggle=e=>{if(e.target.open&&!$('pageimg').childElementCount)renderPages('reader',u.s,u.e,$('pageimg'))};
   $('prevU').onclick=()=>{S.unitIdx--;save();renderReader();syncUnitSel()};
   $('skipU').onclick=()=>{S.unitIdx++;save();renderReader();syncUnitSel()};
   $('doneU').onclick=()=>{
-    const filled=Object.values(S.trans[u.n]||{}).filter(v=>v.trim()).length;
+    const filled=Object.values(S.st[u.n]||{}).filter(v=>v.trim()).length+Object.values(S.trans[u.n]||{}).filter(v=>v.trim()).length;
     if(data.paras.length&&!filled&&!confirm('Hiç çeviri yazmadın. Yine de bitti sayılsın mı?'))return;
     logDay('read');S.unitIdx++;save();toast(`Ünite ${u.n} tamam 🌿`);renderReader();renderPlan();syncUnitSel();window.scrollTo({top:0,behavior:'smooth'})};
 }
+function showTip(se,t){const tip=$('stip');tip.textContent=t&&t.trim()?t:'Bu cümleyi henüz çevirmedin';tip.classList.toggle('empty',!(t&&t.trim()));
+  const r=se.getClientRects()[0]||se.getBoundingClientRect();tip.classList.add('show');
+  const w=Math.min(440,document.documentElement.clientWidth-16);tip.style.maxWidth=w+'px';
+  const tw=tip.offsetWidth,th=tip.offsetHeight;let x=r.left+scrollX;x=Math.max(8,Math.min(x,document.documentElement.clientWidth-tw-8));
+  let y=r.top+scrollY-th-8;if(r.top-th-8<0)y=(se.getBoundingClientRect().bottom)+scrollY+8;tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){$('stip').classList.remove('show')}
 function sentenceOf(el){
+  const se=el.closest('.sent'); if(se) return se.textContent.trim();
   const txt=el.closest('.en').textContent; const pos=(()=>{let n=0;for(const node of el.closest('.en').childNodes){if(node===el||node.contains?.(el))return n;n+=node.textContent.length}return 0})();
   let a=txt.lastIndexOf('.',pos-1);a=Math.max(a,txt.lastIndexOf('!',pos-1),txt.lastIndexOf('?',pos-1));
   let b=txt.slice(pos).search(/[.!?]/);b=b<0?txt.length:pos+b+1;
