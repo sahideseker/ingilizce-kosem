@@ -174,6 +174,51 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vnote{width:100%;min-height:110px;font:inherit;font-size:15px;line-height:1.6;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;color:var(--text);resize:vertical}
 .vnote:focus{outline:2px solid var(--accent-bg);border-color:var(--accent)}
+/* reminder */
+#remind{border:1px solid var(--line);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--yellow-bg);border-color:transparent}
+#remind[hidden]{display:none}
+#remind b{font-weight:600}#remind .sp{flex:1}
+/* dictionary */
+.drs{display:grid;grid-template-columns:minmax(120px,auto) 1fr auto auto;gap:12px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px}
+.drs .word{font-weight:600;display:flex;gap:6px;align-items:center}
+.drs .mean{color:var(--muted)}
+.ib{background:none;border:1px solid var(--line);border-radius:6px;cursor:pointer;padding:3px 8px;font-size:13px}
+.ib:hover{background:var(--hover)}
+.ib.on{color:var(--green);border-color:transparent;cursor:default}
+/* games */
+.gcard{border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background .12s}
+.gcard:hover{background:var(--panel2)}
+.gcard .ico{font-size:26px}.gcard b{font-size:16px;font-weight:600}.gcard p{font-size:13.5px;color:var(--muted);flex:1}
+.gcard .best{font-size:12px;color:var(--faint)}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.ghead h2{margin:0}
+.gstat{font-size:14px;color:var(--muted);display:flex;gap:14px}
+.gstat b{color:var(--text)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mi{border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;background:var(--panel);text-align:left;font-size:15px;transition:all .15s;min-height:48px}
+.mi:hover{background:var(--panel2)}
+.mi.sel{border-color:var(--accent);background:var(--accent-bg)}
+.mi.ok{border-color:transparent;background:var(--green-bg);color:var(--green);opacity:.55;cursor:default}
+.mi.bad{border-color:var(--red);animation:shake .3s}
+.mi.en{font-weight:600}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.qbox{max-width:620px;margin:0 auto;text-align:center}
+.qword{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:6px 0 4px}
+.qsub{color:var(--muted);font-size:14px;margin-bottom:18px;min-height:20px}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qopts .mi{text-align:center}
+.qopts .mi.right{border-color:transparent;background:var(--green-bg);color:var(--green);opacity:1}
+.qbar{height:3px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:18px}.qbar div{height:100%;background:var(--text);transition:width .3s}
+.spin{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.spin input{font:inherit;font-size:20px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:10px 14px;width:min(360px,100%);background:var(--panel);color:var(--text)}
+.spin input:focus{outline:2px solid var(--accent-bg);border-color:var(--accent)}
+.bigspk{font-size:30px;width:74px;height:74px;border-radius:50%;border:1px solid var(--line);background:var(--panel);cursor:pointer;margin:6px auto 12px;display:grid;place-items:center}
+.bigspk:hover{background:var(--accent-bg);border-color:var(--accent)}
+.gres{text-align:center;padding:10px 0}
+.gres .big{font-size:42px;font-weight:700}
+.wrongs{margin-top:16px;text-align:left}
+@media(max-width:620px){.mgrid{gap:8px 10px}.qopts{grid-template-columns:1fr}.mi{font-size:14px;padding:10px}}
 /* popup */
 .pop{position:absolute;z-index:20;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 32px -10px rgba(0,0,0,.25);padding:14px;width:300px;display:none}
 .pop.show{display:block}
@@ -273,6 +318,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim</button>
     <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
     <button class="tab" data-v="listen"><span class="i">♪</span>Dinleme</button>
+    <button class="tab" data-v="games"><span class="i">◆</span>Oyunlar</button>
     <button class="tab" data-v="setup"><span class="i">⚙</span>Ayarlar</button>
   </nav>
   <div id="unitsCard" hidden style="display:contents">
@@ -294,6 +340,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
         <div class="step" id="stL"><div class="ic"></div><div><b>Dinleme</b><span id="stLt">–</span></div></div>
       </div>
     </div>
+    <div class="card" id="remind" hidden></div>
     <div class="card" id="readerCard">
       <div class="loading">Yükleniyor…</div>
     </div>
@@ -313,6 +360,9 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
   <!-- WORDS -->
   <section class="view" id="v-words">
     <div class="page-h"><h1>Kelimelerim</h1></div>
+    <div class="card"><h2>Sözlük</h2>
+      <div class="tools"><input id="dq" placeholder="İngilizce ya da Türkçe bir kelime yaz… (ör. achieve, başarmak)" style="flex:1;min-width:260px" autocomplete="off"><a class="btn" id="turengLink" href="https://tureng.com/tr/turkce-ingilizce" target="_blank" rel="noopener">Tureng'de ara ↗</a></div>
+      <div class="wlist" id="dres"></div></div>
     <div class="card">
       <div class="stats" id="stats"></div>
     </div>
@@ -331,6 +381,14 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     <div class="card">
       <div class="glist" id="glist"></div>
     </div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="view" id="v-games">
+    <div class="page-h"><h1>Oyunlar</h1><p>Kelimelerini oyunla pekiştir. Önce hangi kelimelerle oynayacağını seç.</p></div>
+    <div class="card"><div class="seg" id="poolSeg" style="flex-wrap:wrap"></div><p class="muted" id="poolInfo" style="font-size:13px;margin-top:8px"></p></div>
+    <div class="card" id="gameMenu"><div class="res" id="gameCards"></div></div>
+    <div class="card" id="gameArea" hidden></div>
   </section>
 
   <!-- LISTEN -->
@@ -829,7 +887,8 @@ const LIB=[
   ['q7jOwW5pe20','English In A Minute: 4 ways to use "like"','1 dk'],['uldbn_Prt8s','English In A Minute: 3 facts about "the"','1 dk'],['W3d9SfPdS48','English In A Minute: 5 ways to use "set"','1 dk'],
   ['k-yvS6WYxkM','English In A Minute: 4 ways to use "just"','1 dk'],['MqjKOZSdG90','English In A Minute: Box set 1',''],['Dxq-SqReU0M','English In A Minute: Box set 13',''],['bRnGm3y0IFU','English In A Minute: Box set 31',''],
   ['5b5zdQFVIII','English at Work 1: The Interview',''],['4zB8KhyYlx4','English at Work: episodes 6–10','20 dk'],['3v912B6RJ9c','English at Work: episodes 26–30',''],
-  ['o1VxetMgFOQ','News Review: DNA study – better coffee?',''],['kgCC4Do5T50','News Review: Review of the year 2022','']]},
+  ['o1VxetMgFOQ','News Review: DNA study – better coffee?',''],['kgCC4Do5T50','News Review: Review of the year 2022',''],
+  ['j64n3KdIob0','Real Easy English: How to talk about your brain',''],['M03vuos_nLI','Real Easy English: Talking about the news',''],['fdRmGvmeY1U','Improve your pronunciation: Introduction','']]},
  {id:'teded',name:'TED-Ed',lvl:'B2',desc:'Kısa animasyonlu bilim ve tarih dersleri. Akademik kelime, net anlatım. Önce altyazısız izle, sonra altyazıyla tekrar et.',pre:'',v:[
   ['LkGOGzpbrCk','The science of hearing'],['f2O6mQkFiiw','How to practice effectively… for just about anything'],['iWDKsHm6gTA','How languages evolve'],['kIzFz9T5rhI','How did English evolve?'],
   ['xyQY8a-ng6g','How the food you eat affects your brain'],['GASaqPv0t0g','Why do our bodies age?'],['YVfyYrEmzgM','How does your body know you\'re full?'],['-SPRPkLoKp8','How do your hormones work?'],
@@ -837,7 +896,14 @@ const LIB=[
   ['FwGH4gulLX4','The science of snowflakes'],['WYQ3O8U6SMY','How small are we in the scale of the universe?'],['CBZH4dMac-Q','What is the universe made of?'],['6PiyUjVxukI','What is the universe expanding into?'],
   ['upp9-w6GPhU','Could we survive prolonged space travel?'],['GD3dgiDreGc','History vs. Christopher Columbus'],['Y6EhRwn4zkc','History vs. Cleopatra'],['xdZcqAss92w','History vs. Henry VIII'],
   ['Jsj-hDW9bS8','The history of the world according to cats'],['KsuesiVJgtI','History through the eyes of a chicken'],['VmWVXOIQblM','A brief history of banned numbers'],
-  ['CVo225pUaSA','The science behind the myth: Homer\'s Odyssey'],['A0edKgL9EgM','The art of the metaphor'],['3ezPMAoxSbw','Scientists still don\'t know the answer to this infamous question']].map(x=>[x[0],x[1],'~5 dk'])},
+  ['CVo225pUaSA','The science behind the myth: Homer\'s Odyssey'],['A0edKgL9EgM','The art of the metaphor'],['3ezPMAoxSbw','Scientists still don\'t know the answer to this infamous question'],
+  ['I5ZR0jMlxX0','What causes economic bubbles?'],['EaxjxICgahc','What is a gift economy?'],['257wV-AbKaE','How does money laundering work?'],
+  ['AkFi90lZmXA','Inside your computer'],['p3q5zWCw8J4','How computer memory works'],['WhNyURBiJcU','How transistors work'],['er3v4PVNQqE','The hidden network that makes the internet possible'],['J8hzJxb0rpc','What is the world wide web?'],
+  ['U69LIr0OrNc','The otherworldly creatures in the ocean\'s deepest depths'],['bOYIKJho18I','Robert Ballard: On exploring the oceans'],
+  ['i7930fj3T54','How do we study the stars?'],['SgLO10cUC1M','Should we be looking for life elsewhere in the universe?'],['vyUnzfMh-zA','The journey to Pluto, the farthest world ever explored'],['HZ7hwUduMoU','What light can teach us about the universe']].map(x=>[x[0],x[1],'~5 dk'])},
+ {id:'sleep',name:'Uyku bilimi',lvl:'B2',desc:'TED\'in kısa "Sleeping with Science" serisi ve Matt Walker\'ın ünlü konuşması. Aynı konuda birden çok video: kelimeler tekrar tekrar karşına çıkar.',pre:'',v:[
+  ['5MuIMqhT8DM','Matt Walker: Sleep is your superpower','20 dk'],['knJWF4km3y0','How much sleep do you really need?','~5 dk'],['eM2VWspRpfk','A walk through the stages of sleep','~5 dk'],
+  ['6F8wFkScnME','How sleep affects your emotions','~5 dk'],['6TyIY6u31gk','Hacking your memory — with sleep','~5 dk'],['KQ9FfzMKBNc','How caffeine and alcohol affect your sleep','~5 dk'],['t0kACis_dJE','6 tips for better sleep','~5 dk']]},
  {id:'ted',name:'TED ve TEDx',lvl:'C1',desc:'Uzun akademik konuşmalar: IELTS Listening 4. bölüm (ders/sunum) için en iyi hazırlık. Not alarak dinle; ana fikri ve 3 destekleyici noktayı yaz.',pre:'',v:[
   ['iG9CE55wbtY','Ken Robinson: Do schools kill creativity?','20 dk'],['arj7oStGLkU','Tim Urban: Inside the mind of a master procrastinator','14 dk'],
   ['8KkKuTCFvzI','Robert Waldinger: What makes a good life?','13 dk'],['4q1dgn_C0AU','Dan Gilbert: The surprising science of happiness','21 dk'],
@@ -847,7 +913,8 @@ const LIB=[
   ['z7_LwuuPsAE','Anil Seth: How your brain invents your "self"',''],['Wgt8QUHQjw8','How your brain decides what is beautiful',''],
   ['LrtlmbkvvEs','How stress drains your brain — and what to do about it',''],['W8djC9GoZVw','The surprising science of adolescent brains',''],
   ['OtQhybh4zug','Daniel Lieberman: Brains, brawn and the evolution of the human body',''],['tlWuP7wESZw','Ilissa Ocko: The fastest way to slow climate change now','10 dk'],
-  ['uEztHu4NHrs','The last 6 decades of AI — and what comes next',''],['jnPfz0WXLIM','3 possible futures for AI — which will we choose?','']]},
+  ['uEztHu4NHrs','The last 6 decades of AI — and what comes next',''],['jnPfz0WXLIM','3 possible futures for AI — which will we choose?',''],
+  ['SFnMTHhKdkw','Rita Pierson: Every kid needs a champion','8 dk'],['bJ8Kq1wucsk','Paul Piff: Does money make you mean?','16 dk']]},
 ];
 let libCat=LS.get('libCat','bbc');
 function libVideo(id){for(const c of LIB){const x=c.v.find(v=>v[0]===id);if(x){S.vlib[id]=Object.assign({note:'',watched:null},S.vlib[id]);return Object.assign(S.vlib[id],{id,title:(c.pre||'')+x[1],start:0,lib:true})}}return null}
@@ -892,7 +959,7 @@ function renderPlan(){
   $('streak').textContent=n;
 }
 function updateCounts(){
-  const due=dueList().length;$('dueBadge').hidden=!due;$('dueBadge').textContent=due;
+  const due=dueList().length;$('dueBadge').hidden=!due;$('dueBadge').textContent=due;renderRemind();
   $('learnedChip').textContent=Object.values(S.words).filter(v=>v.box>=5).length;
 }
 $('stG').onclick=()=>{const ni=nextGrammar();if(ni>=0)openGrammar(ni)};
@@ -900,10 +967,122 @@ $('stR').onclick=()=>$('readerCard').scrollIntoView({behavior:'smooth'});
 $('stV').onclick=()=>go('review');
 $('stL').onclick=()=>{LS.set('rmode','dict');renderReader();setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth'}),100)};
 
+/* ---------- dictionary ---------- */
+const OXK=Object.keys(OXFORD);
+const trNorm=t=>t.toLocaleLowerCase('tr').trim();
+function addWord(k,m,ex){const o=OXFORD[k];if(S.words[k])return;S.words[k]={w:o?o.w:k,m:m||(o?o.m.slice(0,2).join(', '):''),l:o?o.l:null,ex:ex||'',unit:'Sözlük',box:0,due:addDays(1),added:dayKey(),phrase:false};save();updateCounts()}
+function renderDict(){const q=$('dq').value.trim();$('turengLink').href='https://tureng.com/tr/turkce-ingilizce/'+encodeURIComponent(q);
+  if(q.length<2){$('dres').innerHTML='';return}
+  const ql=q.toLowerCase(),qt=trNorm(q);let res=[];
+  const lk=lookup(q);if(lk)res.push(lk.key);
+  for(const k of OXK){if(res.length>=40)break;if(k!==res[0]&&k.startsWith(ql))res.push(k)}
+  if(res.length<40)for(const k of OXK){if(res.length>=40)break;if(!res.includes(k)&&OXFORD[k].m.some(m=>trNorm(m).split(/[\s,;()]+/).includes(qt)||trNorm(m)===qt))res.push(k)}
+  if(res.length<40&&qt.length>=3)for(const k of OXK){if(res.length>=40)break;if(!res.includes(k)&&OXFORD[k].m.some(m=>trNorm(m).includes(qt)))res.push(k)}
+  $('dres').innerHTML=res.length?res.map(k=>{const o=OXFORD[k];return `<div class="drs"><span class="word">${esc(o.w)} <span class="lvl" style="background:var(--${o.l})">${o.l}</span></span><span class="mean">${esc(o.m.join(', '))}</span><button class="ib" data-say="${esc(o.w)}" title="Dinle">🔊</button>${S.words[k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(k)}">+ Ekle</button>`}</div>`}).join('')
+    :`<div class="empty">Oxford 5000 listesinde bulunamadı. <a href="https://tureng.com/tr/turkce-ingilizce/${encodeURIComponent(q)}" target="_blank" rel="noopener">Tureng'de ara ↗</a></div>`;
+}
+$('dq').oninput=()=>{clearTimeout($('dq')._h);$('dq')._h=setTimeout(renderDict,120)};
+$('dres').onclick=e=>{const a=e.target.closest('[data-add]'),sp=e.target.closest('[data-say]');
+  if(sp){stopTTS();say(sp.dataset.say)} if(a){addWord(a.dataset.add);renderDict();renderWords();toast('Kelimelerine eklendi 🌱')}};
+
+/* ---------- games ---------- */
+S.games=S.games||{};
+let pool='mine', game=null;
+const shortM=m=>{const p=m.split(/[,;]/).map(x=>x.trim()).filter(Boolean);return (p[0]||m).slice(0,40)};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function poolItems(id){
+  if(id==='mine'||id==='due'){let E=Object.entries(S.words);if(id==='due')E=E.filter(([k,v])=>v.due<=dayKey());
+    return E.filter(([k,v])=>v.m).map(([k,v])=>({k,w:v.w,m:v.m,l:v.l,mine:true}))}
+  return OXK.filter(k=>OXFORD[k].l===id&&OXFORD[k].m.length).map(k=>({k,w:OXFORD[k].w,m:OXFORD[k].m.slice(0,2).join(', '),l:id}))}
+function renderGames(){
+  const P=[['due','Bugün tekrar'],['mine','Kelimelerim'],['B1','Oxford B1'],['B2','Oxford B2'],['C1','Oxford C1']];
+  const n=id=>poolItems(id).length;
+  if((pool==='mine'||pool==='due')&&n(pool)<4)pool=n('mine')>=4?'mine':'B2';
+  $('poolSeg').innerHTML=P.map(([id,l])=>`<button data-p="${id}" class="${pool===id?'on':''}" ${n(id)<4?'disabled style="opacity:.4"':''}>${l} <span style="opacity:.6">${n(id)}</span></button>`).join('');
+  document.querySelectorAll('#poolSeg button').forEach(b=>b.onclick=()=>{if(b.disabled)return;pool=b.dataset.p;renderGames()});
+  $('poolInfo').textContent=n('mine')<4?'Kelimelerim ile oynamak için en az 4 kelime ekle. Şimdilik Oxford listelerinden oynayabilirsin; bilmediklerini oyun sonunda tek tıkla listene eklersin.':(pool==='due'?'Bugün tekrar zamanı gelen kelimelerin.':pool==='mine'?'Eklediğin tüm kelimeler.':'Oxford 5000 listesinden rastgele kelimeler; bilmediklerini listene ekleyebilirsin.');
+  const G=[['match','🧩','Eşleştir','6 kelimeyi Türkçe anlamlarıyla eşleştir. Ne kadar hızlı?',S.games.match?.best?`En iyi: ${S.games.match.best} sn`:''],
+           ['quiz','🎯','Anlam bul','Kelimeyi gör, doğru anlamı 4 şık arasından seç. 10 soru, iki yönlü.',S.games.quiz?.best!=null?`En iyi: ${S.games.quiz.best}/10`:''],
+           ['spell','🎧','Dinle ve yaz','Kelimeyi dinle, doğru yaz. Yazım için birebir; IELTS Listening\'de yazım çok önemli.',S.games.spell?.best!=null?`En iyi: ${S.games.spell.best}/10`:''],
+           ['rev','🔁','Ters çeviri','Türkçe anlamı gör, İngilizcesini yaz. Writing ve speaking için kelimeyi aktif hale getirir.',S.games.rev?.best!=null?`En iyi: ${S.games.rev.best}/10`:'']];
+  $('gameCards').innerHTML=G.map(([id,i,t,d,b])=>`<div class="gcard" data-g="${id}"><div class="ico">${i}</div><b>${t}</b><p>${d}</p><div class="best">${b||'&nbsp;'}</div></div>`).join('');
+  document.querySelectorAll('.gcard').forEach(c=>c.onclick=()=>startGame(c.dataset.g));
+  $('gameMenu').hidden=false;$('gameArea').hidden=true;
+}
+function endArea(){stopTTS();$('gameArea').hidden=true;$('gameMenu').hidden=false;$('poolSeg').parentElement.hidden=false;renderGames()}
+function gHead(t,extra){return `<div class="ghead"><h2>${t}</h2><div class="gstat">${extra||''}<button class="btn small" id="gQuit">✕ Bitir</button></div></div>`}
+function startGame(id){const items=shuffle(poolItems(pool));if(items.length<4){toast('Bu havuzda yeterli kelime yok');return}
+  $('gameMenu').hidden=true;$('poolSeg').parentElement.hidden=true;$('gameArea').hidden=false;logDay('game');
+  ({match:gMatch,quiz:gQuiz,spell:gSpell,rev:gRev})[id](items);$('gameArea').scrollIntoView({behavior:'smooth',block:'start'})}
+function finish(id,score,total,wrong,extraTxt){
+  const prev=S.games[id]?.best;let best=prev,rec=false;
+  if(id==='match'){if(prev==null||score<prev){best=score;rec=prev!=null}}else{if(prev==null||score>prev){best=score;rec=prev!=null}}
+  S.games[id]={best,last:score,played:(S.games[id]?.played||0)+1};save();
+  $('gameArea').innerHTML=`<div class="gres"><div class="big">${id==='match'?score+' sn':score+' / '+total}</div><div class="muted">${extraTxt||''}${rec?' · 🏆 Yeni rekor!':''}</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn primary" id="again">Tekrar oyna</button><button class="btn" id="back">Oyunlara dön</button></div>
+    ${wrong.length?`<div class="wrongs"><h2 style="font-size:15px">Tekrar etmen gerekenler</h2>${wrong.map(x=>`<div class="drs"><span class="word">${esc(x.w)}${x.l?` <span class="lvl" style="background:var(--${x.l})">${x.l}</span>`:''}</span><span class="mean">${esc(x.m)}</span><button class="ib" data-say="${esc(x.w)}">🔊</button>${S.words[x.k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(x.k)}">+ Ekle</button>`}</div>`).join('')}</div>`:''}</div>`;
+  $('again').onclick=()=>startGame(id);$('back').onclick=endArea;
+  $('gameArea').querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{stopTTS();say(b.dataset.say)});
+  $('gameArea').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addWord(b.dataset.add);b.outerHTML='<span class="ib on">✓ listede</span>';toast('Eklendi 🌱')});
+}
+function gMatch(items){const set=items.slice(0,6),L=shuffle(set),R=shuffle(set);let sel=null,done=0,miss=0,t0=Date.now(),wrong=new Set();
+  $('gameArea').innerHTML=gHead('🧩 Eşleştir',`<span>Süre <b id="gT">0</b> sn</span><span>Hata <b id="gM">0</b></span>`)+
+    `<div class="mgrid"><div class="mcol">${L.map(x=>`<button class="mi en" data-k="${esc(x.k)}" data-s="L">${esc(x.w)}</button>`).join('')}</div><div class="mcol">${R.map(x=>`<button class="mi" data-k="${esc(x.k)}" data-s="R">${esc(shortM(x.m))}</button>`).join('')}</div></div>`;
+  const tick=setInterval(()=>{const e=$('gT');if(!e){clearInterval(tick);return}e.textContent=Math.round((Date.now()-t0)/1000)},500);
+  $('gQuit').onclick=()=>{clearInterval(tick);endArea()};
+  $('gameArea').querySelectorAll('.mi').forEach(b=>b.onclick=()=>{if(b.classList.contains('ok'))return;
+    if(!sel||sel.dataset.s===b.dataset.s){$('gameArea').querySelectorAll('.mi.sel').forEach(x=>x.classList.remove('sel'));sel=b;b.classList.add('sel');if(b.dataset.s==='L'){stopTTS();say(b.textContent)}return}
+    if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.classList.remove('sel');x.classList.add('ok')});done++;sel=null;
+      if(done===set.length){clearInterval(tick);const sec=Math.round((Date.now()-t0)/1000);setTimeout(()=>finish('match',sec,6,set.filter(x=>wrong.has(x.k)),`${miss} hata`),400)}}
+    else{miss++;$('gM').textContent=miss;wrong.add(sel.dataset.k);wrong.add(b.dataset.k);const a=sel;[a,b].forEach(x=>x.classList.add('bad'));setTimeout(()=>[a,b].forEach(x=>x.classList.remove('bad','sel')),350);sel=null}})}
+function gQuiz(items){const qs=items.slice(0,10);let i=0,score=0,wrong=[];const all=poolItems(pool).length>=12?poolItems(pool):poolItems(pool).concat(poolItems('B2'));
+  const ask=()=>{if(i>=qs.length){finish('quiz',score,qs.length,wrong,score>=9?'Harika!':score>=6?'İyi gidiyor':'Bunları tekrar etmeye değer');return}
+    const q=qs[i],dir=Math.random()<.6?'en':'tr',dis=shuffle(all.filter(x=>x.k!==q.k&&shortM(x.m)!==shortM(q.m))).slice(0,3),opts=shuffle([q,...dis]);
+    $('gameArea').innerHTML=gHead('🎯 Anlam bul',`<span>Soru <b>${i+1}/${qs.length}</b></span><span>Doğru <b>${score}</b></span>`)+
+      `<div class="qbox"><div class="qbar"><div style="width:${i/qs.length*100}%"></div></div><div class="qword">${esc(dir==='en'?q.w:shortM(q.m))}</div><div class="qsub">${dir==='en'?'Türkçe anlamı hangisi?':'İngilizcesi hangisi?'}${q.l?` · <span class="lvl" style="background:var(--${q.l})">${q.l}</span>`:''}</div>
+      <div class="qopts">${opts.map(o=>`<button class="mi" data-k="${esc(o.k)}">${esc(dir==='en'?shortM(o.m):o.w)}</button>`).join('')}</div></div>`;
+    if(dir==='en'){stopTTS();say(q.w)}
+    $('gQuit').onclick=endArea;
+    $('gameArea').querySelectorAll('.qopts .mi').forEach(b=>b.onclick=()=>{if($('gameArea').querySelector('.qopts .right'))return;
+      const ok=b.dataset.k===q.k;$('gameArea').querySelectorAll('.qopts .mi').forEach(x=>{if(x.dataset.k===q.k)x.classList.add('right')});
+      if(ok)score++;else{b.classList.add('bad');wrong.push(q)} if(dir==='tr'){stopTTS();say(q.w)} i++;setTimeout(ask,ok?700:1500)})};
+  ask()}
+function typeGame(items,id,title,promptFn){const qs=items.slice(0,10);let i=0,score=0,wrong=[];
+  const ask=()=>{if(i>=qs.length){finish(id,score,qs.length,wrong,score>=9?'Harika!':score>=6?'İyi gidiyor':'Bunları tekrar etmeye değer');return}
+    const q=qs[i];let hint=0;
+    $('gameArea').innerHTML=gHead(title,`<span>Soru <b>${i+1}/${qs.length}</b></span><span>Doğru <b>${score}</b></span>`)+
+      `<div class="qbox"><div class="qbar"><div style="width:${i/qs.length*100}%"></div></div>${promptFn(q)}
+      <div class="spin"><input id="sIn" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Yaz ve Enter'a bas"></div>
+      <div class="qsub" id="sFb" style="margin-top:12px"></div>
+      <div style="display:flex;gap:8px;justify-content:center"><button class="btn small" id="sHint">İpucu</button><button class="btn small" id="sSkip">Bilmiyorum</button></div></div>`;
+    $('gQuit').onclick=endArea;const inp=$('sIn');inp.focus();if($('bigSpk'))$('bigSpk').onclick=()=>{stopTTS();say(q.w)};
+    const reveal=(ok)=>{inp.disabled=true;$('sFb').innerHTML=ok?`<b style="color:var(--green)">Doğru ✓</b> ${esc(q.w)} — ${esc(shortM(q.m))}`:`<b style="color:var(--red)">Doğrusu:</b> <b style="color:var(--text)">${esc(q.w)}</b> — ${esc(shortM(q.m))}`;
+      if(ok)score++;else wrong.push(q);stopTTS();say(q.w);i++;setTimeout(ask,ok?900:2200)};
+    inp.onkeydown=e=>{if(e.key!=='Enter'||inp.disabled)return;const v=inp.value.trim().toLowerCase();if(!v)return;reveal(v===q.w.toLowerCase())};
+    $('sHint').onclick=()=>{hint=Math.min(q.w.length-1,hint+1);inp.value=q.w.slice(0,hint);inp.focus()};
+    $('sSkip').onclick=()=>{if(!inp.disabled)reveal(false)};
+    if(id==='spell')setTimeout(()=>{stopTTS();say(q.w)},250)};
+  ask()}
+const gSpell=items=>typeGame(items,'spell','🎧 Dinle ve yaz',q=>`<button class="bigspk" id="bigSpk" title="Tekrar dinle">🔊</button><div class="qsub">Duyduğun kelimeyi yaz${q.l?` · <span class="lvl" style="background:var(--${q.l})">${q.l}</span>`:''}</div>`);
+const gRev=items=>typeGame(items,'rev','🔁 Ters çeviri',q=>`<div class="qword">${esc(shortM(q.m))}</div><div class="qsub">İngilizcesini yaz${q.l?` · <span class="lvl" style="background:var(--${q.l})">${q.l}</span>`:''}</div>`);
+
+/* ---------- reminders ---------- */
+function renderRemind(){const due=dueList().length,el=$('remind');
+  document.title=due?`(${due}) İngilizce Köşem`:'İngilizce Köşem';
+  if(!due){el.hidden=true;return}
+  el.hidden=false;el.innerHTML=`<span style="font-size:20px">🔔</span><span class="sp"><b>${due} kelime</b> tekrar zamanı geldi. Unutmadan önce bir göz at.</span><button class="btn small primary" id="rmRev">Kartlarla tekrar</button><button class="btn small" id="rmGame">Oyunla tekrar</button>${'Notification' in window&&Notification.permission==='default'?'<button class="btn small" id="rmNotif">🔔 Bildirim aç</button>':''}`;
+  $('rmRev').onclick=()=>go('review');$('rmGame').onclick=()=>{pool='due';go('games')};
+  if($('rmNotif'))$('rmNotif').onclick=async()=>{const r=await Notification.requestPermission();if(r==='granted'){toast('Bildirimler açık: siteyi açtığında tekrar bekleyen kelimeleri hatırlatırım');notifyDue(true)}renderRemind()};
+}
+function notifyDue(force){try{if(!('Notification' in window)||Notification.permission!=='granted')return;const due=dueList().length;if(!due)return;
+  if(!force&&LS.get('notified','')===dayKey())return;LS.set('notified',dayKey());
+  new Notification('İngilizce Köşem',{body:`${due} kelime tekrar bekliyor 🔁`,tag:'due'})}catch(_){}}
+
 /* ---------- tabs ---------- */
 function go(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='v-'+v));
   stopTTS(); if(v==='listen')renderListen();
+  if(v==='games')renderGames(); if(v==='today')renderRemind();
   if(v==='review'){queue=[];renderReview()} if(v==='words')renderWords(); if(v==='grammar')renderGrammar(); if(v==='setup')renderSetup(); hidePop()}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
 
@@ -940,7 +1119,8 @@ applyTheme(LS.get('theme','light'));
 $('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 function init(){const h=new Date().getHours();
   $('greet').textContent=h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar';
-  renderPlan();updateCounts();renderReader();}
+  renderPlan();updateCounts();renderReader();notifyDue();}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateCounts();notifyDue()}});
 init();
 </script>
 </body>
