@@ -384,7 +384,7 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 .stat b{font-size:24px;font-weight:700;display:block}
 .stat span{font-size:12.5px;color:var(--muted)}
 .wlist{display:flex;flex-direction:column}
-.wrow{display:grid;grid-template-columns:minmax(120px,auto) 1fr auto auto;gap:14px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px}
+.wrow{display:grid;grid-template-columns:minmax(120px,auto) 1fr auto auto auto;gap:14px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px}
 .wrow:hover{background:var(--panel2)}
 .wrow .word{font-weight:600;display:flex;gap:6px;align-items:center}
 .wrow .mean{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -475,6 +475,13 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 .flash{border-radius:20px;border-color:var(--nline)}
 input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform textarea{border-radius:10px}
 .toast{border-radius:12px}
+#wFilter{flex-wrap:wrap}
+.poolrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}#poolSeg{flex-wrap:wrap}#poolSeg button:disabled{opacity:.4;cursor:default}#poolSeg .cnt{opacity:.55;font-weight:500}#lvlSeg[hidden]{display:none}
+.gcard{border-radius:18px;border-color:var(--nline);padding:20px}.gcard:hover{background:var(--np-bg);border-color:transparent}.gcard b{font-family:Lora,Georgia,serif;font-size:19px;font-weight:700}
+#gameMenu h2{font-size:18px}
+@media(max-width:620px){.wrow{grid-template-columns:1fr auto auto}.wrow .mean{grid-column:1/-1;grid-row:2}.wrow .dots{display:none}}
+.wrow .lrn{border:1px solid var(--nline);background:var(--panel);color:var(--muted);font-size:12.5px;font-weight:500;border-radius:999px;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.wrow .lrn:hover{border-color:var(--ng);color:var(--ng)}.wrow .lrn.on{background:var(--ng-bg);border-color:transparent;color:var(--ng);font-weight:600}
 .addrow{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px}@media(max-width:620px){.addrow{grid-template-columns:1fr}}
 details.bulk{margin-top:16px;border-top:1px solid var(--nline);padding-top:12px}details.bulk summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--np);margin-bottom:10px}
 .drs.addown{display:flex;align-items:center;background:var(--np-bg);border-radius:12px;padding:8px 10px;gap:8px;flex-wrap:wrap}.drs.addown input{flex:1;min-width:160px}
@@ -578,9 +585,11 @@ details.bulk{margin-top:16px;border-top:1px solid var(--nline);padding-top:12px}
 
   <!-- GAMES -->
   <section class="view" id="v-games">
-    <div class="page-h"><h1>Oyunlar</h1><p>Kelimelerini oyunla pekiştir. Önce hangi kelimelerle oynayacağını seç.</p></div>
-    <div class="card"><div class="seg" id="poolSeg" style="flex-wrap:wrap"></div><p class="muted" id="poolInfo" style="font-size:13px;margin-top:8px"></p></div>
-    <div class="card" id="gameMenu"><div class="res" id="gameCards"></div></div>
+    <div class="page-h"><h1>Oyunlar</h1><p>Kelimelerini oyunla pekiştir: önce kelime grubunu, sonra oyunu seç.</p></div>
+    <div class="card" id="gameMenu"><h2>1 · Hangi kelimeler?</h2>
+      <div class="poolrow"><div class="seg" id="poolSeg"></div><div class="seg" id="lvlSeg" hidden></div></div>
+      <p class="muted" id="poolInfo" style="font-size:13px;margin:8px 0 22px"></p>
+      <h2>2 · Oyunu seç</h2><div class="res" id="gameCards"></div></div>
     <div class="card" id="gameArea" hidden></div>
   </section>
 
@@ -1807,10 +1816,11 @@ function renderWords(){
   const rows=all.filter(([k,v])=>(wf==='all'||(wf==='learned'&&v.box>=5)||(wf==='learning'&&v.box<5)||(wf==='phrase'&&v.phrase)||(wf==='yds'&&isYds(v)&&(ydsSel==null||v.day===ydsSel)))&&(!q||k.includes(q)||v.m.toLowerCase().includes(q)))
     .sort((a,b)=>wf==='yds'?((a[1].day||0)-(b[1].day||0)||a[0].localeCompare(b[0])):(b[1].added||'').localeCompare(a[1].added||''));
   $('wlist').innerHTML=rows.length?rows.map(([k,v])=>`<div class="wrow"><span class="word">${esc(v.w)}${v.l?` <span class="lvl" style="background:var(--${v.l})">${v.l}</span>`:v.phrase?' <span class="lvl" style="background:var(--lilac)">kalıp</span>':''}${isYds(v)?` <span class="tag">YDS G${v.day}</span>`:''}</span>
-    <span class="mean" title="${esc(v.ex||'Anlamı düzenlemek için tıkla')}" data-edit="${esc(k)}" style="cursor:text">${v.m?esc(v.m):'<i style="color:var(--red)">anlam ekle</i>'}</span><span class="dots">${[1,2,3,4,5].map(i=>`<i class="${v.box>=i?'on':''}"></i>`).join('')}</span><button class="del" data-k="${esc(k)}" title="Sil">×</button></div>`).join('')
+    <span class="mean" title="${esc(v.ex||'Anlamı düzenlemek için tıkla')}" data-edit="${esc(k)}" style="cursor:text">${v.m?esc(v.m):'<i style="color:var(--red)">anlam ekle</i>'}</span><span class="dots">${[1,2,3,4,5].map(i=>`<i class="${v.box>=i?'on':''}"></i>`).join('')}</span><button class="lrn${v.box>=5?' on':''}" data-lrn="${esc(k)}" title="${v.box>=5?'Öğrenilmedi olarak geri al':'Öğrendim olarak işaretle'}">${v.box>=5?'✓ Öğrenildi':'Öğrendim'}</button><button class="del" data-k="${esc(k)}" title="Sil">×</button></div>`).join('')
     :'<div class="empty">Burada henüz kelime yok.</div>';
 }
 $('wlist').onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){const k=ed.dataset.edit,nv=prompt('Anlamı:',S.words[k].m);if(nv!=null){S.words[k].m=nv.trim();save();renderWords()}return}
+  const l=e.target.closest('[data-lrn]');if(l){const v=S.words[l.dataset.lrn];if(v.box>=5){v.box=0;v.due=addDays(1);toast('Tekrar listesine geri alındı')}else{v.box=5;v.due=addDays(90);toast(`“${v.w}” öğrenildi 🌟`)}save();renderWords();updateCounts();return}
   const b=e.target.closest('.del');if(!b)return;if(!confirm('Bu kelime silinsin mi?'))return;delete S.words[b.dataset.k];save();renderWords();updateCounts()};
 $('wSearch').oninput=renderWords;
 document.querySelectorAll('#wFilter button').forEach(b=>b.onclick=()=>{wf=b.dataset.f;document.querySelectorAll('#wFilter button').forEach(x=>x.classList.toggle('on',x===b));renderWords()});
@@ -1978,33 +1988,37 @@ function poolItems(id){
   if(id==='mine'||id==='due'||id==='yds'||id==='ydsdue'){let E=Object.entries(S.words);if(id==='due'||id==='ydsdue')E=E.filter(([k,v])=>v.due<=dayKey());if(id==='yds'||id==='ydsdue')E=E.filter(([k,v])=>isYds(v));
     return E.filter(([k,v])=>v.m).map(([k,v])=>({k,w:v.w,m:v.m,l:v.l,mine:true}))}
   return OXK.filter(k=>OXFORD[k].l===id&&OXFORD[k].m.length).map(k=>({k,w:OXFORD[k].w,m:OXFORD[k].m.slice(0,2).join(', '),l:id}))}
+let oxLvl=LS.get('oxLvl','B2');
 function renderGames(){
-  const P=[['due','Bugün tekrar'],['mine','Kelimelerim'],['ydsdue','YDS · bugün'],['yds','YDS kelimeleri'],['B1','Oxford B1'],['B2','Oxford B2'],['C1','Oxford C1']];
-  const n=id=>poolItems(id).length;
-  if(['mine','due','yds','ydsdue'].includes(pool)&&n(pool)<4)pool=n('mine')>=4?'mine':'B2';
-  $('poolSeg').innerHTML=P.map(([id,l])=>`<button data-p="${id}" class="${pool===id?'on':''}" ${n(id)<4?'disabled style="opacity:.4"':''}>${l} <span style="opacity:.6">${n(id)}</span></button>`).join('');
-  document.querySelectorAll('#poolSeg button').forEach(b=>b.onclick=()=>{if(b.disabled)return;pool=b.dataset.p;renderGames()});
-  $('poolInfo').textContent=n('mine')<4?'Kelimelerim ile oynamak için en az 4 kelime ekle. Şimdilik Oxford listelerinden oynayabilirsin; bilmediklerini oyun sonunda tek tıkla listene eklersin.':(pool==='due'?'Bugün tekrar zamanı gelen kelimelerin.':pool==='mine'?'Eklediğin tüm kelimeler.':pool==='yds'?'YDS kitabından eklediğin kelimeler.':pool==='ydsdue'?'Bugün tekrar zamanı gelen YDS kelimeleri.':'Oxford 5000 listesinden rastgele kelimeler; bilmediklerini listene ekleyebilirsin.');
-  const G=[['match','🧩','Eşleştir','6 kelimeyi Türkçe anlamlarıyla eşleştir. Ne kadar hızlı?',S.games.match?.best?`En iyi: ${S.games.match.best} sn`:''],
-           ['quiz','🎯','Anlam bul','Kelimeyi gör, doğru anlamı 4 şık arasından seç. 10 soru, iki yönlü.',S.games.quiz?.best!=null?`En iyi: ${S.games.quiz.best}/10`:''],
-           ['spell','🎧','Dinle ve yaz','Kelimeyi dinle, doğru yaz. Yazım için birebir; IELTS Listening\'de yazım çok önemli.',S.games.spell?.best!=null?`En iyi: ${S.games.spell.best}/10`:''],
-           ['rev','🔁','Ters çeviri','Türkçe anlamı gör, İngilizcesini yaz. Writing ve speaking için kelimeyi aktif hale getirir.',S.games.rev?.best!=null?`En iyi: ${S.games.rev.best}/10`:'']];
-  $('gameCards').innerHTML=G.map(([id,i,t,d,b])=>`<div class="gcard" data-g="${id}"><div class="ico">${i}</div><b>${t}</b><p>${d}</p><div class="best">${b||'&nbsp;'}</div></div>`).join('');
+  const n=id=>poolItems(id).length,isOx=['B1','B2','C1'].includes(pool);
+  if(['mine','due','yds'].includes(pool)&&n(pool)<4)pool=n('mine')>=4?'mine':oxLvl;
+  const P=[['mine','Kelimelerim'],['yds','YDS kelimelerim'],['due','Bugün tekrarı gelenler'],['ox','Oxford listesi']];
+  $('poolSeg').innerHTML=P.map(([id,l])=>{const on=id==='ox'?isOx:pool===id,c=id==='ox'?'':n(id);return `<button data-p="${id}" class="${on?'on':''}" ${id!=='ox'&&c<4?'disabled':''}>${l}${id!=='ox'?` <span class="cnt">${c}</span>`:''}</button>`}).join('');
+  document.querySelectorAll('#poolSeg button').forEach(b=>b.onclick=()=>{if(b.disabled)return;pool=b.dataset.p==='ox'?oxLvl:b.dataset.p;renderGames()});
+  $('lvlSeg').hidden=!isOx;$('lvlSeg').innerHTML=['B1','B2','C1'].map(l=>`<button data-l="${l}" class="${pool===l?'on':''}">${l}</button>`).join('');
+  document.querySelectorAll('#lvlSeg button').forEach(b=>b.onclick=()=>{pool=oxLvl=b.dataset.l;LS.set('oxLvl',oxLvl);renderGames()});
+  $('poolInfo').textContent=n('mine')<4&&!isOx?'':({mine:'Eklediğin tüm kelimeler.',yds:'Sözlükten ve YDS kitabından eklediğin kelimeler.',due:'Bugün tekrar zamanı gelen kelimelerin; kartlara ek pratik.'}[pool]
+    ||'Oxford listesinden rastgele kelimeler. Bilmediklerini oyun sonunda tek tıkla Kelimelerim\'e ekleyebilirsin.')+(n('mine')<4&&!isOx?'':'')+(n('mine')<4?' Kendi kelimelerinle oynamak için en az 4 kelime ekle.':'');
+  const G=[['match','🧩','Eşleştir','6 kelimeyi Türkçe anlamlarıyla eşleştir.'],
+           ['quiz','🎯','Anlam bul','Kelimeyi gör, doğru anlamı 4 şıktan seç. 10 soru.'],
+           ['spell','🎧','Dinle ve yaz','Kelimeyi dinle, doğru yaz. Yazımı oturtur.'],
+           ['rev','🔁','Ters çeviri','Türkçesini gör, İngilizcesini yaz. Kelimeyi aktif hale getirir.']];
+  $('gameCards').innerHTML=G.map(([id,i,t,d])=>`<div class="gcard" data-g="${id}"><div class="ico">${i}</div><b>${t}</b><p>${d}</p></div>`).join('');
   document.querySelectorAll('.gcard').forEach(c=>c.onclick=()=>startGame(c.dataset.g));
   $('gameMenu').hidden=false;$('gameArea').hidden=true;
 }
 function endArea(){stopTTS();$('gameArea').hidden=true;$('gameMenu').hidden=false;$('poolSeg').parentElement.hidden=false;renderGames()}
 function gHead(t,extra){return `<div class="ghead"><h2>${t}</h2><div class="gstat">${extra||''}<button class="btn small" id="gQuit">✕ Bitir</button></div></div>`}
 function startGame(id){const items=shuffle(poolItems(pool));if(items.length<4){toast('Bu havuzda yeterli kelime yok');return}
-  $('gameMenu').hidden=true;$('poolSeg').parentElement.hidden=true;$('gameArea').hidden=false;logDay('game');
+  $('gameMenu').hidden=true;$('gameArea').hidden=false;logDay('game');
   ({match:gMatch,quiz:gQuiz,spell:gSpell,rev:gRev})[id](items);$('gameArea').scrollIntoView({behavior:'smooth',block:'start'})}
 function finish(id,score,total,wrong,extraTxt){
   const prev=S.games[id]?.best;let best=prev,rec=false;
   if(id==='match'){if(prev==null||score<prev){best=score;rec=prev!=null}}else{if(prev==null||score>prev){best=score;rec=prev!=null}}
   S.games[id]={best,last:score,played:(S.games[id]?.played||0)+1};save();
-  $('gameArea').innerHTML=`<div class="gres"><div class="big">${id==='match'?score+' sn':score+' / '+total}</div><div class="muted">${extraTxt||''}${rec?' · 🏆 Yeni rekor!':''}</div>
+  $('gameArea').innerHTML=`<div class="gres"><div class="big">${id==='match'?score+' sn':score+' / '+total}</div><div class="muted">${extraTxt||''}</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn primary" id="again">Tekrar oyna</button><button class="btn" id="back">Oyunlara dön</button></div>
-    ${wrong.length?`<div class="wrongs"><h2 style="font-size:15px">Tekrar etmen gerekenler</h2>${wrong.map(x=>`<div class="drs"><span class="word">${esc(x.w)}${x.l?` <span class="lvl" style="background:var(--${x.l})">${x.l}</span>`:''}</span><span class="mean">${esc(x.m)}</span><button class="ib" data-say="${esc(x.w)}">🔊</button>${S.words[x.k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(x.k)}">+ Ekle</button>`}</div>`).join('')}</div>`:''}</div>`;
+    ${wrong.length?`<div class="wrongs"><h2 style="font-size:17px">Tekrar etmen gerekenler</h2>${wrong.map(x=>`<div class="drs"><span class="word">${esc(x.w)}${x.l?` <span class="lvl" style="background:var(--${x.l})">${x.l}</span>`:''}</span><span class="mean">${esc(x.m)}</span><button class="ib" data-say="${esc(x.w)}">🔊</button>${S.words[x.k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(x.k)}">+ Ekle</button>`}</div>`).join('')}</div>`:''}</div>`;
   $('again').onclick=()=>startGame(id);$('back').onclick=endArea;
   $('gameArea').querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{stopTTS();say(b.dataset.say)});
   $('gameArea').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addWord(b.dataset.add);b.outerHTML='<span class="ib on">✓ listede</span>';toast('Eklendi 🌱')});
