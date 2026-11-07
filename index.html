@@ -760,7 +760,6 @@ async function renderReader(){
           ${mode==='dict'?`<button class="btn small" id="veilBtn">${veil?'Metni göster':'Metni gizle'}</button>`:''}</div></div>
       ${S.hl&&mode==='study'?'<div class="legend"><span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span><span><i style="background:var(--yellow-bg);height:10px"></i>kelimelerim</span><span><i style="background:var(--purple-bg);height:10px;border-bottom:2px solid var(--B1)"></i>kalıplarım</span><span style="margin-left:auto">Kelimeye tıkla: anlam · birkaç kelime seç: kalıp ekle</span></div>':''}
       <div class="reading en${mode==='dict'&&veil?' veil':''}" id="readText">${sents.map(ss=>`<p>${ss.map(x=>`<span class="sent${seen[x.id]?' has':''}" data-id="${x.id}">${wrapWords(x.t)}</span>`).join(' ')}</p>`).join('')}</div>
-      ${data.questions?`<details class="qs"><summary>Ünitenin soruları</summary><pre>${esc(data.questions)}</pre></details>`:''}
       ${mode==='study'?`
       <div class="sec2"><h3>Cümle cümle</h3><span id="sCount">${nSeen} / ${flat.length} cümle çalışıldı</span></div>
       ${nAnl?`<ol class="howto"><li>Cümleyi oku; bilmediğin kelimeye tıklayıp anlamına bak.</li><li>Kafanda çevirmeyi dene.</li><li><b>✂️ Parçalara ayır</b>: cümlenin iskeletini ve neden oradan bölündüğünü gör.</li><li><b>✅ Çözüm</b>: Türkçesi, nasıl çevrildiği, kelimeler, kalıplar ve gramer.</li></ol>`
