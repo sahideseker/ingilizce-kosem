@@ -475,6 +475,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 .flash{border-radius:20px;border-color:var(--nline)}
 input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform textarea{border-radius:10px}
 .toast{border-radius:12px}
+#stats[hidden],#weekBox[hidden]{display:none!important}
 :root[data-theme="dark"] .btn.primary,:root[data-theme="dark"] .brand .logo{color:#2a1420}
 .modal .box{border-radius:22px}
 .drawer{border-radius:22px 0 0 22px}
@@ -497,7 +498,7 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
     <div style="padding:0 10px 8px"><div class="seg" id="bookSeg" style="width:100%;display:flex"><button data-b="r1" class="on" style="flex:1">Reader 1</button><button data-b="r2" style="flex:1">Reader 2</button><button data-b="yds" style="flex:1">YDS</button></div></div>
     <div class="ustrip" id="ustrip"></div>
   </div>
-  <div class="side-foot"><span>🔥 <b id="streak">0</b> gün</span><span>✓ <b id="learnedChip">0</b> öğrenildi</span><button class="icon-btn" id="themeBtn" title="Gece / gündüz">☾</button></div>
+  <div class="side-foot"><span hidden><b id="streak">0</b><b id="learnedChip">0</b></span><span style="flex:1"></span><button class="icon-btn" id="themeBtn" title="Gece / gündüz">☾</button></div>
 </aside>
 <main class="main">
   <!-- TODAY -->
@@ -533,9 +534,7 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button class="btn primary" id="ydsAdd">Listeye ekle</button><span class="muted" id="ydsMsg" style="font-size:13px"></span></div></div></div>
       <div class="ydsdays" id="ydsDays"></div>
     </div>
-    <div class="card">
-      <div class="stats" id="stats"></div>
-    </div>
+    <div class="stats" id="stats" hidden></div>
     <div class="card">
       <div class="tools">
         <input id="wSearch" placeholder="Kelime ara…">
@@ -551,7 +550,7 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
     <div class="nhero"><div class="kick">YDS · GRAMER &amp; ÇEVİRİ</div><h1>YDS Gramer Notları</h1>
       <p>Çeviri yaparken ve YDS sorularında en çok işine yarayacak 20 konu. Her konuda yapı, Türkçeye çeviri ipucu, sık yapılan hatalar ve örnek cümleler; altında da kendi notların için yer var.</p>
       <div class="nleg"><span class="l1">◆ Yapı</span><span class="l2">⇄ Çeviri ipucu</span><span class="l3">⚠ YDS tuzağı</span><span class="l4">✎ Örnek</span></div>
-      <div class="nhact"><a class="btn" href="yds-gramer-notlari.pdf" target="_blank" rel="noopener" download>📄 PDF olarak indir</a><span id="gIntro"></span></div>
+      <div class="nhact"><a class="btn" href="yds-gramer-notlari.pdf" target="_blank" rel="noopener" download>📄 PDF olarak indir</a><span id="gIntro" hidden></span></div>
       <div class="aa">Aa</div></div>
     <div class="ncard"><h2 class="nserif">Metin çözerken hızlı bakış</h2><p class="nsub">Bir YDS cümlesine takıldığında önce bu kartı uygula, sonra ilgili konuya in.</p>
       <div class="nsteps"><div><b>1</b>Ana (çekimli) fiili bul</div><div><b>2</b>Öznesini bul: fiilin solundaki isim öbeği</div><div><b>3</b>Bağlaç, virgül, <span class="nhl">-ing / -ed</span> yerlerinden parçala</div><div><b>4</b>Parçaları çevir, sondan başa birleştir</div><div><b>5</b>Türkçeyi doğallaştır</div></div>
@@ -575,7 +574,7 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
   <!-- LISTEN -->
   <section class="view" id="v-listen">
     <div class="page-h"><h1>Dinleme</h1><p>Her gün okuma ekranında <b>Dikte</b> modunu kullan; haftada birkaç kez de buradan bir video izle. Önce altyazısız, sonra altyazıyla.</p></div>
-    <div class="card"><div class="week" id="weekBox"></div></div>
+    <div id="weekBox" hidden></div>
     <div class="card"><div class="unit-head" style="margin-bottom:12px"><h2 style="margin:0">Video kütüphanesi</h2><div class="seg" id="libSeg" style="flex-wrap:wrap"></div></div>
       <p class="muted" style="font-size:14px;margin-bottom:12px" id="libDesc"></p>
       <div class="vgrid" id="libList"></div></div>
@@ -1892,7 +1891,7 @@ function renderLib(){const c=LIB.find(x=>x.id===libCat)||LIB[0];
   $('libSeg').innerHTML=LIB.map(x=>`<button data-c="${x.id}" class="${x.id===c.id?'on':''}">${esc(x.name)} <span style="opacity:.6">${x.v.length}</span></button>`).join('');
   document.querySelectorAll('#libSeg button').forEach(b=>b.onclick=()=>{libCat=b.dataset.c;LS.set('libCat',libCat);renderLib()});
   const w=c.v.filter(v=>S.vlib[v[0]]?.watched).length;
-  $('libDesc').innerHTML=`<b style="color:var(--text);font-weight:600">${c.lvl}</b> · ${esc(c.desc)} <span style="white-space:nowrap">· ${w}/${c.v.length} izlendi</span>`;
+  $('libDesc').innerHTML=`<b style="color:var(--text);font-weight:600">${c.lvl}</b> · ${esc(c.desc)}`;
   $('libList').innerHTML=c.v.map(([id,t,len])=>{const st=S.vlib[id]||{};return `<div class="vcard${st.watched?' done':''}" data-lib="${id}"><div class="thumb"><img loading="lazy" src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt=""><span class="play">▶</span>${st.watched?'<span class="wt">✓ izlendi</span>':''}${len?`<span class="len">${len}</span>`:''}</div><div class="vt" style="padding-right:0">${esc(t)}</div>${st.note?'<div class="vn">📝 not var</div>':''}</div>`}).join('');
 }
 $('libList').onclick=e=>{const c=e.target.closest('[data-lib]');if(c)openVideo(c.dataset.lib)};
