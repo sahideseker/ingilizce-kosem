@@ -409,16 +409,14 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
   <div class="brand"><div class="logo">E</div>İngilizce Köşem</div>
   <nav class="tabs" id="tabs">
     <button class="tab active" data-v="today"><span class="i">▤</span>Metinler</button>
-    <button class="tab" data-v="plan"><span class="i">◎</span>Günlük plan</button>
-    <button class="tab" data-v="review"><span class="i">↻</span>Tekrar<span class="badge" id="dueBadge" hidden>0</span></button>
-    <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim</button>
-    <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
+    <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim<span class="badge" id="dueBadge" hidden>0</span></button>
     <button class="tab" data-v="listen"><span class="i">♪</span>Dinleme</button>
+    <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
     <button class="tab" data-v="games"><span class="i">◆</span>Oyunlar</button>
     <button class="tab" data-v="setup"><span class="i">⚙</span>Ayarlar</button>
   </nav>
   <div id="unitsCard" hidden style="display:contents">
-    <div class="side-h">Metinler <span id="uCount"></span></div>
+    <div class="side-h">Üniteler <span id="uCount"></span></div>
     <div style="padding:0 10px 8px"><div class="seg" id="bookSeg" style="width:100%;display:flex"><button data-b="r1" class="on" style="flex:1">Reader 1</button><button data-b="r2" style="flex:1">Reader 2</button></div></div>
     <div class="ustrip" id="ustrip"></div>
   </div>
@@ -432,24 +430,9 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     </div>
   </section>
 
-  <!-- PLAN -->
-  <section class="view" id="v-plan">
-    <div class="page-h"><h1 id="greet">Bugün</h1></div>
-    <div class="card">
-      <div class="plan">
-        <div class="step" id="stG"><div class="ic"></div><div><b>Gramer konusu</b><span id="stGt">–</span></div></div>
-        <div class="step" id="stR"><div class="ic"></div><div><b>Metin çevirisi</b><span id="stRt">–</span></div></div>
-        <div class="step" id="stV"><div class="ic"></div><div><b>Kelime tekrarı</b><span id="stVt">–</span></div></div>
-        <div class="step" id="stL"><div class="ic"></div><div><b>Dinleme</b><span id="stLt">–</span></div></div>
-        <div class="step" id="stY"><div class="ic"></div><div><b>YDS kelimeleri</b><span id="stYt">–</span></div></div>
-      </div>
-    </div>
-    <div class="card" id="remind" hidden></div>
-  </section>
-
   <!-- REVIEW -->
   <section class="view" id="v-review">
-    <div class="page-h"><h1>Tekrar</h1><p>Bildiklerin 1, 3, 7, 14, 30 ve 90 gün arayla tekrar karşına çıkar. 30 günlük tekrarı geçen kelime öğrenildi sayılır.</p></div>
+    <div class="page-h"><button class="btn small" id="backWords" style="margin-bottom:10px">← Kelimelerim</button><h1>Kelime tekrarı</h1><p>Bildiklerin 1, 3, 7, 14, 30 ve 90 gün arayla tekrar karşına çıkar. 30 günlük tekrarı geçen kelime öğrenildi sayılır.</p></div>
     <div class="card">
       <div class="unit-head" style="justify-content:center;gap:10px;flex-wrap:wrap">
         <div class="seg" id="revSeg"></div>
@@ -461,7 +444,8 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 
   <!-- WORDS -->
   <section class="view" id="v-words">
-    <div class="page-h"><h1>Kelimelerim</h1></div>
+    <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><h1>Kelimelerim</h1><button class="btn primary" id="toRev">↻ Kelime tekrarı</button></div>
+    <div class="card" id="remind" hidden></div>
     <div class="card"><h2>Sözlük</h2>
       <div class="tools"><input id="dq" placeholder="İngilizce ya da Türkçe bir kelime yaz… (ör. achieve, başarmak)" style="flex:1;min-width:260px" autocomplete="off"><a class="btn" id="turengLink" href="https://tureng.com/tr/turkce-ingilizce" target="_blank" rel="noopener">Tureng'de ara ↗</a></div>
       <div class="wlist" id="dres"></div></div>
@@ -1183,20 +1167,6 @@ function openVideo(id){const v=S.videos.find(x=>x.id===id)||libVideo(id);if(!v)r
 }
 /* ---------- plan, streak, counts ---------- */
 function renderPlan(){
-  const t=S.log[dayKey()]||{};const ni=nextYds();
-  const gDone=Object.values(S.grammarDone).includes(dayKey())||Object.values(S.ydsDone).includes(dayKey());
-  $('stG').classList.toggle('done',gDone);
-  $('stGt').textContent=gDone?'Bugünkü konu tamam':(ni>=0?YDSN[ni].t:'Hepsi bitti 🎉');
-  $('stR').classList.toggle('done',!!t.read);
-  $('stRt').textContent=t.read?`${t.read} ünite bitti`:(UNITS[S.unitIdx]?`Ünite ${UNITS[S.unitIdx].n} · ${UNITS[S.unitIdx].t}`:'Kitap bitti');
-  const due=dueList().length;
-  $('stV').classList.toggle('done',due===0&&!!t.rev);
-  $('stVt').textContent=due?`${due} kart bekliyor`:(t.rev?'Tekrar tamam':'Bugün kart yok');
-  const yMax=ydsMaxDay(),yDue=dueList().filter(([k,v])=>isYds(v)).length;
-  $('stY').classList.toggle('done',!!t.yds&&!yDue);
-  $('stYt').textContent=t.yds?(yDue?`${yDue} tekrar bekliyor`:'Bugün tamam'):(yMax?`Gün ${yMax+1} listesini ekle${yDue?` · ${yDue} tekrar`:''}`:'Gün 1 listesini ekle');
-  $('stL').classList.toggle('done',!!t.listen);
-  $('stLt').textContent=t.listen?'Bugün dinledin':'Dikte ya da bir kaynak';
   // streak: days with reading
   let n=0;const d=new Date();if(!(S.log[dayKey(d)]||{}).read)d.setDate(d.getDate()-1);
   while((S.log[dayKey(d)]||{}).read){n++;d.setDate(d.getDate()-1)}
@@ -1206,11 +1176,7 @@ function updateCounts(){
   const due=dueList().length;$('dueBadge').hidden=!due;$('dueBadge').textContent=due;renderRemind();
   $('learnedChip').textContent=Object.values(S.words).filter(v=>v.box>=5).length;
 }
-$('stG').onclick=()=>{const ni=nextYds();openDrawer(ni>=0?YDSN[ni].id:undefined)};
-$('stR').onclick=()=>go('today');
-$('stV').onclick=()=>go('review');
-$('stY').onclick=()=>{const yDue=dueList().filter(([k,v])=>isYds(v)).length;if(yDue&&(S.log[dayKey()]||{}).yds){revPool='yds';LS.set('revPool','yds');go('review')}else{go('words');setTimeout(()=>$('ydsIn').focus(),50)}};
-$('stL').onclick=()=>{LS.set('rmode','dict');go('today');renderReader();setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth'}),100)};
+$('toRev').onclick=()=>go('review');$('backWords').onclick=()=>go('words');
 
 /* ---------- dictionary ---------- */
 const OXK=Object.keys(OXFORD);
@@ -1325,10 +1291,10 @@ function notifyDue(force){try{if(!('Notification' in window)||Notification.permi
   new Notification('İngilizce Köşem',{body:`${due} kelime tekrar bekliyor 🔁`,tag:'due'})}catch(_){}}
 
 /* ---------- tabs ---------- */
-function go(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
+function go(v){const tv=v==='review'?'words':v;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===tv));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='v-'+v));
   stopTTS(); if(v==='listen')renderListen();
-  if(v==='games')renderGames(); if(v==='plan'){renderPlan();renderRemind()}
+  if(v==='games')renderGames(); if(v==='words')renderRemind();
   if(v==='review'){queue=[];renderReview()} if(v==='words')renderWords(); if(v==='grammar')renderGrammar(); if(v==='setup')renderSetup(); hidePop()}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
 
@@ -1370,7 +1336,7 @@ const applyTheme=t=>{document.documentElement.dataset.theme=t;LS.set('theme',t);
 applyTheme(LS.get('theme','light'));
 $('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 function init(){const h=new Date().getHours();
-  $('greet').textContent=h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar';
+
   renderPlan();updateCounts();loadAnl().then(renderReader);notifyDue();
   askPersist()}
 function askPersist(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}}
