@@ -462,7 +462,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 .page-h{position:relative;overflow:hidden;border:1px solid var(--nline);border-radius:22px;padding:26px 28px;background:linear-gradient(135deg,var(--np-bg),var(--panel) 70%);margin-bottom:16px}
 .page-h h1,.r-title{font-family:Lora,Georgia,serif;font-weight:700;letter-spacing:-.02em}
 .page-h h1{font-size:34px}.r-title{font-size:32px}
-.view>.card,.view>.wrap>.card{border:1px solid var(--nline);border-radius:22px;padding:24px;background:var(--panel);margin-bottom:16px}
+.view>.card,.view>.wrap>.card,#wDict>.card,#wMine>.card{border:1px solid var(--nline);border-radius:22px;padding:24px;background:var(--panel);margin-bottom:16px}
 .card h2,.sec2 h3{font-family:Lora,Georgia,serif;font-weight:700;letter-spacing:-.01em}.card h2{font-size:22px}.sec2 h3{font-size:22px}
 .unit-no{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.06em;color:var(--np)}
 .progress div{background:var(--np)}
@@ -475,6 +475,11 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 .flash{border-radius:20px;border-color:var(--nline)}
 input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform textarea{border-radius:10px}
 .toast{border-radius:12px}
+.addrow{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px}@media(max-width:620px){.addrow{grid-template-columns:1fr}}
+details.bulk{margin-top:16px;border-top:1px solid var(--nline);padding-top:12px}details.bulk summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--np);margin-bottom:10px}
+.drs.addown{display:flex;align-items:center;background:var(--np-bg);border-radius:12px;padding:8px 10px;gap:8px;flex-wrap:wrap}.drs.addown input{flex:1;min-width:160px}
+#wDict[hidden],#wMine[hidden]{display:none}
+.addrow input,.drs.addown input{font:inherit;font-size:14.5px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);min-width:0}
 #stats[hidden],#weekBox[hidden]{display:none!important}
 :root[data-theme="dark"] .btn.primary,:root[data-theme="dark"] .brand .logo{color:#2a1420}
 .modal .box{border-radius:22px}
@@ -487,7 +492,7 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
   <div class="brand"><div class="logo">E</div>İngilizce Köşem</div>
   <nav class="tabs" id="tabs">
     <button class="tab active" data-v="today"><span class="i">▤</span>Metinler</button>
-    <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim<span class="badge" id="dueBadge" hidden>0</span></button>
+    <button class="tab" data-v="words"><span class="i">≡</span>Kelimeler<span class="badge" id="dueBadge" hidden>0</span></button>
     <button class="tab" data-v="listen"><span class="i">♪</span>Dinleme</button>
     <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
     <button class="tab" data-v="games"><span class="i">◆</span>Oyunlar</button>
@@ -522,25 +527,33 @@ input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform te
 
   <!-- WORDS -->
   <section class="view" id="v-words">
-    <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><h1>Kelimelerim</h1><button class="btn primary" id="toRev">↻ Kelime tekrarı</button></div>
-    <div class="card" id="remind" hidden></div>
+    <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><div><h1>Kelimeler</h1>
+      <div class="seg" id="wTabs" style="margin-top:12px"><button data-t="dict">📖 Sözlük</button><button data-t="mine">🌱 Kelimelerim</button></div></div>
+      <button class="btn primary" id="toRev">↻ Kelime tekrarı</button></div>
+    <div id="remind" hidden></div>
+    <div id="wDict">
     <div class="card"><h2>Sözlük</h2>
       <div class="tools"><input id="dq" placeholder="İngilizce ya da Türkçe bir kelime yaz… (ör. achieve, başarmak)" style="flex:1;min-width:260px" autocomplete="off"><a class="btn" id="turengLink" href="https://tureng.com/tr/turkce-ingilizce" target="_blank" rel="noopener">Tureng'de ara ↗</a></div>
       <div class="wlist" id="dres"></div></div>
-    <div class="card"><h2>📕 YDS kelimeleri</h2>
-      <p class="muted" style="font-size:13.5px;margin-bottom:10px">Kitabındaki günün listesini yaz ya da yapıştır: her satıra bir kelime. Anlamı boş bırakırsan Oxford'dan doldururum. Kelimeler <b>YDS</b> etiketiyle aralıklı tekrara girer.</p>
+    <div class="card"><h2>Kendi kelimeni ekle</h2>
+      <p class="muted" style="font-size:13.5px;margin-bottom:10px">Eklediğin her kelime <b>YDS</b> etiketiyle Kelimelerim'e girer ve aralıklı tekrara düşer. Anlamı boş bırakırsan Oxford'dan doldururum.</p>
+      <div class="addrow"><input id="awW" placeholder="İngilizce (ör. assess)" autocomplete="off"><input id="awM" placeholder="Türkçe anlamı (ör. değerlendirmek)" autocomplete="off"><button class="btn primary" id="awBtn">Ekle</button></div>
+      <details class="bulk"><summary>Kitaptan liste yapıştır (her satıra bir kelime)</summary>
       <div class="ydsform"><label style="font-size:13px;color:var(--muted)">Gün<input id="ydsDay" type="number" min="1" max="120"></label>
         <div><textarea id="ydsIn" placeholder="abandon - terk etmek&#10;significant = önemli&#10;crucial: çok önemli&#10;assess"></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button class="btn primary" id="ydsAdd">Listeye ekle</button><span class="muted" id="ydsMsg" style="font-size:13px"></span></div></div></div>
-      <div class="ydsdays" id="ydsDays"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button class="btn primary" id="ydsAdd">Listeye ekle</button><span class="muted" id="ydsMsg" style="font-size:13px"></span></div></div></div></details>
     </div>
+    </div>
+    <div id="wMine">
     <div class="stats" id="stats" hidden></div>
     <div class="card">
       <div class="tools">
         <input id="wSearch" placeholder="Kelime ara…">
         <div class="seg" id="wFilter"><button data-f="all" class="on">Hepsi</button><button data-f="learning">Öğreniliyor</button><button data-f="learned">Öğrenildi</button><button data-f="phrase">Kalıplar</button><button data-f="yds">YDS</button></div>
       </div>
+      <div class="ydsdays" id="ydsDays"></div>
       <div class="wlist" id="wlist"></div>
+    </div>
     </div>
   </section>
 
@@ -1792,7 +1805,7 @@ function renderWords(){
   const q=$('wSearch').value.trim().toLowerCase();
   renderYdsDays();
   const rows=all.filter(([k,v])=>(wf==='all'||(wf==='learned'&&v.box>=5)||(wf==='learning'&&v.box<5)||(wf==='phrase'&&v.phrase)||(wf==='yds'&&isYds(v)&&(ydsSel==null||v.day===ydsSel)))&&(!q||k.includes(q)||v.m.toLowerCase().includes(q)))
-    .sort((a,b)=>wf==='yds'?((a[1].day||0)-(b[1].day||0)||a[0].localeCompare(b[0])):b[1].added.localeCompare(a[1].added));
+    .sort((a,b)=>wf==='yds'?((a[1].day||0)-(b[1].day||0)||a[0].localeCompare(b[0])):(b[1].added||'').localeCompare(a[1].added||''));
   $('wlist').innerHTML=rows.length?rows.map(([k,v])=>`<div class="wrow"><span class="word">${esc(v.w)}${v.l?` <span class="lvl" style="background:var(--${v.l})">${v.l}</span>`:v.phrase?' <span class="lvl" style="background:var(--lilac)">kalıp</span>':''}${isYds(v)?` <span class="tag">YDS G${v.day}</span>`:''}</span>
     <span class="mean" title="${esc(v.ex||'Anlamı düzenlemek için tıkla')}" data-edit="${esc(k)}" style="cursor:text">${v.m?esc(v.m):'<i style="color:var(--red)">anlam ekle</i>'}</span><span class="dots">${[1,2,3,4,5].map(i=>`<i class="${v.box>=i?'on':''}"></i>`).join('')}</span><button class="del" data-k="${esc(k)}" title="Sil">×</button></div>`).join('')
     :'<div class="empty">Burada henüz kelime yok.</div>';
@@ -1929,16 +1942,32 @@ function addWord(k,m,ex){const o=OXFORD[k];if(S.words[k])return;S.words[k]={w:o?
 function renderDict(){const q=$('dq').value.trim();$('turengLink').href='https://tureng.com/tr/turkce-ingilizce/'+encodeURIComponent(q);
   if(q.length<2){$('dres').innerHTML='';return}
   const ql=q.toLowerCase(),qt=trNorm(q);let res=[];
+  const mine=Object.entries(S.words).filter(([k,v])=>!OXFORD[k]&&(k.startsWith(ql)||(v.m&&trNorm(v.m).includes(qt)))).slice(0,10);
   const lk=lookup(q);if(lk)res.push(lk.key);
   for(const k of OXK){if(res.length>=40)break;if(k!==res[0]&&k.startsWith(ql))res.push(k)}
   if(res.length<40)for(const k of OXK){if(res.length>=40)break;if(!res.includes(k)&&OXFORD[k].m.some(m=>trNorm(m).split(/[\s,;()]+/).includes(qt)||trNorm(m)===qt))res.push(k)}
   if(res.length<40&&qt.length>=3)for(const k of OXK){if(res.length>=40)break;if(!res.includes(k)&&OXFORD[k].m.some(m=>trNorm(m).includes(qt)))res.push(k)}
-  $('dres').innerHTML=res.length?res.map(k=>{const o=OXFORD[k];return `<div class="drs"><span class="word">${esc(o.w)} <span class="lvl" style="background:var(--${o.l})">${o.l}</span></span><span class="mean">${esc(o.m.join(', '))}</span><button class="ib" data-say="${esc(o.w)}" title="Dinle">🔊</button>${S.words[k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(k)}">+ Ekle</button>`}</div>`}).join('')
-    :`<div class="empty">Oxford 5000 listesinde bulunamadı. <a href="https://tureng.com/tr/turkce-ingilizce/${encodeURIComponent(q)}" target="_blank" rel="noopener">Tureng'de ara ↗</a></div>`;
+  const mineHtml=mine.map(([k,v])=>`<div class="drs"><span class="word">${esc(v.w)} ${isYds(v)?'<span class="lvl" style="background:var(--np)">YDS</span>':''}</span><span class="mean">${esc(v.m||'—')}</span><button class="ib" data-say="${esc(v.w)}" title="Dinle">🔊</button><span class="ib on">✓ listede</span></div>`).join('');
+  const addHtml=(!lk&&!res.length&&!/[çğıöşüâî]/i.test(q)&&!mine.some(([k])=>k===ql))?`<div class="drs addown"><span class="word">${esc(q)}</span><input id="dresM" placeholder="Türkçe anlamı" autocomplete="off"><button class="btn small primary" data-own="${esc(q)}">+ Sözlüğüme ekle</button></div>`:'';
+  $('dres').innerHTML=mineHtml+addHtml+(res.length?res.map(k=>{const o=OXFORD[k];return `<div class="drs"><span class="word">${esc(o.w)} <span class="lvl" style="background:var(--${o.l})">${o.l}</span></span><span class="mean">${esc(o.m.join(', '))}</span><button class="ib" data-say="${esc(o.w)}" title="Dinle">🔊</button>${S.words[k]?'<span class="ib on">✓ listede</span>':`<button class="ib" data-add="${esc(k)}">+ Ekle</button>`}</div>`}).join('')
+    :(mine.length?'':`<div class="empty">Oxford 5000 listesinde yok. Anlamını <a href="https://tureng.com/tr/turkce-ingilizce/${encodeURIComponent(q)}" target="_blank" rel="noopener">Tureng'de</a> bulup yukarıdan kendi sözlüğüne ekleyebilirsin.</div>`));
 }
 $('dq').oninput=()=>{clearTimeout($('dq')._h);$('dq')._h=setTimeout(renderDict,120)};
-$('dres').onclick=e=>{const a=e.target.closest('[data-add]'),sp=e.target.closest('[data-say]');
-  if(sp){stopTTS();say(sp.dataset.say)} if(a){addWord(a.dataset.add);renderDict();renderWords();toast('Kelimelerine eklendi 🌱')}};
+let wtab=LS.get('wtab','mine');
+function setWTab(x){wtab=x;LS.set('wtab',x);$('wDict').hidden=x!=='dict';$('wMine').hidden=x!=='mine';
+  document.querySelectorAll('#wTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===x));if(x==='mine')renderWords();else setTimeout(()=>$('dq').focus(),50)}
+document.querySelectorAll('#wTabs button').forEach(b=>b.onclick=()=>setWTab(b.dataset.t));setWTab(wtab);
+function addMine(w,m){w=w.trim();m=(m||'').trim();if(!w)return null;const ph=w.includes(' ');const o=!ph?lookup(w):null;const k=o?o.key:w.toLowerCase();
+  const mean=m||(o?o.m.slice(0,2).join(', '):'');const day=Math.max(1,ydsMaxDay());
+  if(S.words[k]){Object.assign(S.words[k],{tag:'yds',day:S.words[k].day||day});if(m)S.words[k].m=m}
+  else S.words[k]={w:o?o.w:w,m:mean,l:o?o.l:null,ex:'',unit:'Sözlük',box:0,due:addDays(1),added:dayKey(),phrase:ph,tag:'yds',day};
+  save();updateCounts();return {k,mean}}
+$('awBtn').onclick=()=>{const r=addMine($('awW').value,$('awM').value);if(!r){toast('Önce kelimeyi yaz');$('awW').focus();return}
+  toast(r.mean?'Kelimelerine eklendi (YDS) 🌱':'Eklendi; anlamını Kelimelerim\'de yazabilirsin');$('awW').value='';$('awM').value='';$('awW').focus();renderDict()};
+['awW','awM'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter')$('awBtn').click()});
+$('dres').onclick=e=>{const own=e.target.closest('[data-own]');if(own){const r=addMine(own.dataset.own,$('dresM').value);toast('Kelimelerine eklendi (YDS) 🌱');renderDict();return}
+const a=e.target.closest('[data-add]'),sp=e.target.closest('[data-say]');
+  if(sp){stopTTS();say(sp.dataset.say)} if(a){addMine(OXFORD[a.dataset.add].w);renderDict();renderWords();toast('Kelimelerine eklendi 🌱')}};
 
 /* ---------- games ---------- */
 S.games=S.games||{};
@@ -2024,7 +2053,7 @@ const gRev=items=>typeGame(items,'rev','🔁 Ters çeviri',q=>`<div class="qword
 /* ---------- reminders ---------- */
 function renderRemind(){const due=dueList().length,el=$('remind');
   document.title=due?`(${due}) İngilizce Köşem`:'İngilizce Köşem';
-  if(!due){el.hidden=true;return}
+  el.hidden=true;return;
   const yd=dueList().filter(([k,v])=>isYds(v)).length;
   el.hidden=false;el.innerHTML=`<span style="font-size:20px">🔔</span><span class="sp"><b>${due} kelime</b>${yd?` (${yd} tanesi YDS)`:''} tekrar zamanı geldi. Unutmadan önce bir göz at.</span><button class="btn small primary" id="rmRev">Kartlarla tekrar</button><button class="btn small" id="rmGame">Oyunla tekrar</button>${'Notification' in window&&Notification.permission==='default'?'<button class="btn small" id="rmNotif">🔔 Bildirim aç</button>':''}`;
   $('rmRev').onclick=()=>go('review');$('rmGame').onclick=()=>{pool='due';go('games')};
