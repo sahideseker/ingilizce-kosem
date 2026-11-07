@@ -186,7 +186,7 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 :root{--np:#b04a74;--np-bg:#fbeaf1;--nl:#5b63c7;--nl-bg:#eef0fc;--ng:#2f8a5f;--ng-bg:#e8f5ee;--nr:#c9473d;--nr-bg:#fdeceb;--ny:#b7770f;--ny-bg:#fdf5e4;--hl-bg:#f8e6ef;--hl:#4a2142;--nline:#ece6e9}
 :root[data-theme="dark"]{--np:#e58bb0;--np-bg:#3a2430;--nl:#a3a9f0;--nl-bg:#25273d;--ng:#74c79c;--ng-bg:#1d3127;--nr:#ef8a80;--nr-bg:#3a2321;--ny:#e2b05c;--ny-bg:#382e1b;--hl-bg:#4a2a3c;--hl:#f6dbe8;--nline:#3a3337}
 .nserif{font-family:Lora,Georgia,serif;font-weight:700;letter-spacing:-.01em}
-.nwrap{display:flex;flex-direction:column;gap:16px;max-width:900px}
+.nwrap{display:flex;flex-direction:column;gap:16px}
 .nhero{position:relative;overflow:hidden;border:1px solid var(--nline);border-radius:22px;padding:30px 30px 26px;background:linear-gradient(135deg,var(--np-bg),var(--panel) 70%)}
 .nhero .kick{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;letter-spacing:.12em;color:var(--np)}
 .nhero h1{font-family:Lora,Georgia,serif;font-size:38px;font-weight:700;letter-spacing:-.02em;margin:6px 0 10px;position:relative;z-index:1}
@@ -208,7 +208,7 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 .nbox.green{background:var(--ng-bg)}.nbox.green h4,.nbox.green li::marker{color:var(--ng)}
 .nbox.red{background:var(--nr-bg)}.nbox.red h4{color:var(--nr)}.nbox ul.warn li::marker{content:"⚠  ";color:var(--nr)}
 .nbox.yel{background:var(--ny-bg)}.nbox.yel h4{color:var(--ny)}
-.hl{background:var(--hl-bg);color:var(--hl);font-weight:600;padding:1px 5px;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.nhl{background:var(--hl-bg);color:var(--hl);font-weight:600;padding:1px 5px;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .ntoc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
 .ntoc .nitem{border:0;padding:8px 8px;align-items:flex-start;gap:12px;border-radius:10px}
 .ntoc .nitem .no,.note .nsb{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--np)}.ntoc .nitem .no{font-size:13px;padding-top:1px}
@@ -272,7 +272,7 @@ details.qs pre{white-space:pre-wrap;font-family:var(--serif);font-size:15.5px;li
 :root[data-theme="dark"] .tag{background:#3a2222}
 @media(max-width:620px){.ydsform{grid-template-columns:1fr}}
 /* study mode */
-.rwrap{max-width:820px;margin:0 auto}
+.rwrap{width:100%}
 .mbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 12px}
 .mbar .lbar{margin:0}
 #paras .reading{margin-top:14px;padding:18px 22px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
@@ -525,11 +525,11 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
       <div class="nhact"><a class="btn" href="yds-gramer-notlari.pdf" target="_blank" rel="noopener" download>📄 PDF olarak indir</a><span id="gIntro"></span></div>
       <div class="aa">Aa</div></div>
     <div class="ncard"><h2 class="nserif">Metin çözerken hızlı bakış</h2><p class="nsub">Bir YDS cümlesine takıldığında önce bu kartı uygula, sonra ilgili konuya in.</p>
-      <div class="nsteps"><div><b>1</b>Ana (çekimli) fiili bul</div><div><b>2</b>Öznesini bul: fiilin solundaki isim öbeği</div><div><b>3</b>Bağlaç, virgül, <span class="hl">-ing / -ed</span> yerlerinden parçala</div><div><b>4</b>Parçaları çevir, sondan başa birleştir</div><div><b>5</b>Türkçeyi doğallaştır</div></div>
+      <div class="nsteps"><div><b>1</b>Ana (çekimli) fiili bul</div><div><b>2</b>Öznesini bul: fiilin solundaki isim öbeği</div><div><b>3</b>Bağlaç, virgül, <span class="nhl">-ing / -ed</span> yerlerinden parçala</div><div><b>4</b>Parçaları çevir, sondan başa birleştir</div><div><b>5</b>Türkçeyi doğallaştır</div></div>
       <div class="ncols3">
-        <div class="nbox lav"><h4>Bağlaç → anlam</h4><ul class="plain"><li><span class="hl">although / even though</span> → -mesine rağmen</li><li><span class="hl">while / whereas</span> → oysa / -irken</li><li><span class="hl">so that</span> → -sın diye</li><li><span class="hl">as soon as</span> → -ir -mez</li><li><span class="hl">unless</span> → -mezse</li><li><span class="hl">in case</span> → … olur diye</li></ul></div>
-        <div class="nbox green"><h4>Geçiş sözcükleri</h4><ul class="plain"><li><span class="hl">however / nevertheless</span> → ancak</li><li><span class="hl">therefore / thus / hence</span> → bu nedenle</li><li><span class="hl">moreover / furthermore</span> → üstelik</li><li><span class="hl">on the contrary</span> → aksine</li><li><span class="hl">on the other hand</span> → öte yandan</li><li><span class="hl">in fact / indeed</span> → aslında, hatta</li></ul></div>
-        <div class="nbox red"><h4>Edat + isim (cümle değil!)</h4><ul class="plain"><li><span class="hl">despite / in spite of</span> → -e rağmen</li><li><span class="hl">due to / owing to</span> → -den dolayı</li><li><span class="hl">in terms of</span> → … açısından</li><li><span class="hl">result in</span> → yol açmak</li><li><span class="hl">result from</span> → -den kaynaklanmak</li><li><span class="hl">according to</span> → -e göre</li></ul></div>
+        <div class="nbox lav"><h4>Bağlaç → anlam</h4><ul class="plain"><li><span class="nhl">although / even though</span> → -mesine rağmen</li><li><span class="nhl">while / whereas</span> → oysa / -irken</li><li><span class="nhl">so that</span> → -sın diye</li><li><span class="nhl">as soon as</span> → -ir -mez</li><li><span class="nhl">unless</span> → -mezse</li><li><span class="nhl">in case</span> → … olur diye</li></ul></div>
+        <div class="nbox green"><h4>Geçiş sözcükleri</h4><ul class="plain"><li><span class="nhl">however / nevertheless</span> → ancak</li><li><span class="nhl">therefore / thus / hence</span> → bu nedenle</li><li><span class="nhl">moreover / furthermore</span> → üstelik</li><li><span class="nhl">on the contrary</span> → aksine</li><li><span class="nhl">on the other hand</span> → öte yandan</li><li><span class="nhl">in fact / indeed</span> → aslında, hatta</li></ul></div>
+        <div class="nbox red"><h4>Edat + isim (cümle değil!)</h4><ul class="plain"><li><span class="nhl">despite / in spite of</span> → -e rağmen</li><li><span class="nhl">due to / owing to</span> → -den dolayı</li><li><span class="nhl">in terms of</span> → … açısından</li><li><span class="nhl">result in</span> → yol açmak</li><li><span class="nhl">result from</span> → -den kaynaklanmak</li><li><span class="nhl">according to</span> → -e göre</li></ul></div>
       </div></div>
     <div class="ncard"><h2 class="nserif">İçindekiler</h2><div class="ntoc" id="ydsList"></div></div>
     </div>
@@ -716,7 +716,7 @@ const YDSN = [
    "⟦is made / was made / has been made / will be made / can be made / is being made / had been made⟧.",
    "Yapan belirtilecekse: ⟦by …⟧ (tarafından).",
    "⟦It is said/believed/thought that …⟧ = … söylenmektedir/inanılmaktadır.",
-   "X ⟦is said/believed to V1 (to have V3)⟧ = X'in … olduğu söylenir (olduğu söylenir/olmuş olduğu)."
+   "X ⟦is said/believed to V1 (to have V3)⟧ = X'in … olduğu söylenir (olmuş olduğu söylenir)."
   ],
   "tr": [
    "-ılır, -ilir, -ulur, -nır ekleriyle çevir: ⟦was founded⟧ → kuruldu, ⟦is called⟧ → denir / adı …dır.",
@@ -908,7 +908,7 @@ const YDSN = [
   "id": "paired",
   "t": "Çift bağlaçlar",
   "s": "both…and, either…or, not only…but also",
-  "why": "YDS'de neredeyse her sınavda bir soru. Bir yarıyı görünce diğer yarıyı arayın.",
+  "why": "YDS'de neredeyse her sınavda bir soru. Bir yarıyı görünce diğer yarıyı ara.",
   "f": [
    "⟦both⟧ A ⟦and⟧ B: hem A hem B (fiil çoğul).",
    "⟦either⟧ A ⟦or⟧ B: ya A ya B; ⟦neither⟧ A ⟦nor⟧ B: ne A ne B (fiil B'ye uyar).",
@@ -1665,7 +1665,7 @@ function wireSol(box,u,f){
 /* ---------- YDS grammar notes (drawer) ---------- */
 S.ydsDone=S.ydsDone||{};
 const nextYds=()=>YDSN.findIndex(n=>!S.ydsDone[n.id]);
-const mdc=t=>esc(t).replace(/⟦(.*?)⟧/g,'<span class="hl">$1</span>').replace(/→/g,'<span class="arr">→</span>');
+const mdc=t=>esc(t).replace(/⟦(.*?)⟧/g,'<span class="nhl">$1</span>').replace(/→/g,'<span class="arr">→</span>');
 const nn=i=>String(i+1).padStart(2,'0');
 function ydsHtml(n){const done=!!S.ydsDone[n.id],i=YDSN.indexOf(n),mine=(S.myNotes||{})[n.id]||'';
   return `<div class="note">
