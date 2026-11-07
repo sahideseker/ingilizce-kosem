@@ -449,6 +449,35 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
   .main{padding:22px 16px 60px}
   .stats{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ===== site-wide theme (matches the YDS notes design) ===== */
+:root{--accent:var(--np);--accent-bg:var(--np-bg)}
+.brand .logo{background:var(--np);color:#fff;border-radius:8px;font-family:Lora,Georgia,serif}
+.brand{font-family:Lora,Georgia,serif;font-weight:700;font-size:16px}
+.tab{border-radius:10px}.tab.active{background:var(--np-bg);color:var(--np);font-weight:600}
+.tab .badge{background:var(--np)}
+.side-h{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:500;color:var(--np);letter-spacing:.1em;font-size:11.5px}
+.uc{border-radius:10px}.uc.cur{background:var(--np-bg)}.uc.cur .n{color:var(--np)}
+.seg{border-radius:12px;border-color:var(--nline)}.seg button{border-radius:9px}.seg button.on{color:var(--np);font-weight:600}
+.page-h{position:relative;overflow:hidden;border:1px solid var(--nline);border-radius:22px;padding:26px 28px;background:linear-gradient(135deg,var(--np-bg),var(--panel) 70%);margin-bottom:16px}
+.page-h h1,.r-title{font-family:Lora,Georgia,serif;font-weight:700;letter-spacing:-.02em}
+.page-h h1{font-size:34px}.r-title{font-size:32px}
+.view>.card,.view>.wrap>.card{border:1px solid var(--nline);border-radius:22px;padding:24px;background:var(--panel);margin-bottom:16px}
+.card h2,.sec2 h3{font-family:Lora,Georgia,serif;font-weight:700;letter-spacing:-.01em}.card h2{font-size:22px}.sec2 h3{font-size:22px}
+.unit-no{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.06em;color:var(--np)}
+.progress div{background:var(--np)}
+.btn{border-radius:10px;border-color:var(--nline)}
+.btn.primary{background:var(--np);border-color:var(--np);color:#fff}.btn.primary:hover{background:var(--np);opacity:.9}
+.scard{border-radius:16px;border-color:var(--nline)}
+#paras .reading{border-radius:18px;border-color:var(--nline)}
+#remind{border-radius:16px;background:var(--ny-bg)}
+.stats{border-radius:16px;border-color:var(--nline)}
+.flash{border-radius:20px;border-color:var(--nline)}
+input:not([type=file]):not([type=checkbox]):not([type=radio]),select,.ydsform textarea{border-radius:10px}
+.toast{border-radius:12px}
+:root[data-theme="dark"] .btn.primary,:root[data-theme="dark"] .brand .logo{color:#2a1420}
+.modal .box{border-radius:22px}
+.drawer{border-radius:22px 0 0 22px}
 </style>
 </head>
 <body>
