@@ -511,7 +511,7 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
     <div class="page-h"><h1>Ayarlar</h1></div>
     <div class="card">
       <h2>Kitapların</h2>
-      <p class="muted" style="font-size:14px;margin-bottom:14px">Okuma kitabı sadece bu tarayıcıda saklanır, hiçbir yere gönderilmez. Bir kere yüklemen yeterli. Gramer konuları uygulamanın içinde hazır.</p>
+      <p class="muted" style="font-size:14px;margin-bottom:14px">Kitaplar sadece bu tarayıcıda saklanır, hiçbir yere gönderilmez. Bir kere yüklemen yeterli. Çözümleme paketi yüklü ünitelerde PDF'e gerek yok, metin paketten açılır.</p>
       <div class="setup-grid">
         <div class="drop" id="dropR"><div><b>📖 Reader at Work 1</b><span id="dropRt">Henüz yüklenmedi</span></div>
           <label class="btn primary">PDF seç<input type="file" accept="application/pdf" id="fileR"></label></div>
@@ -601,8 +601,10 @@ async function delFiles(){const db=await idb();return new Promise(res=>{const tx
 const docs={};
 async function loadDoc(k){
   if(docs[k]) return docs[k];
-  const b=await getFile(k); if(!b) return null;
-  docs[k]=await pdfjsLib.getDocument({data:new Uint8Array(await b.arrayBuffer())}).promise; return docs[k];
+  let b=await getFile(k); if(!b) return null;
+  let buf; try{buf=b instanceof ArrayBuffer?b:await b.arrayBuffer()}catch(e){return null}
+  if(!(b instanceof ArrayBuffer)){try{await putFile(k,buf.slice(0))}catch(_){}}
+  docs[k]=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise; return docs[k];
 }
 
 /* ---------- lemma lookup ---------- */
@@ -728,19 +730,22 @@ function renderUnits(){
 $('ustrip').onclick=e=>{const b=e.target.closest('.uc');if(!b)return;S.unitIdx=+b.dataset.i;save();if(!$('v-today').classList.contains('active'))go('today');renderReader();renderPlan();syncUnitSel();window.scrollTo({top:0,behavior:'smooth'})};
 async function renderReader(){
   const card=$('readerCard');
-  const has=await getFile(B.file);
-  card.dataset.has=has?'1':'0'; renderUnits();
-  if(!has){card.innerHTML=`<div class="empty">📖 ${B.name} için PDF'i bir kere yükle.<br><br><label class="btn primary">${B.name} PDF'ini seç<input type="file" accept="application/pdf" id="fileR2"></label></div>`;
+  let has=null;try{has=await getFile(B.file)}catch(_){}
+  const pkg=S.unitIdx<UNITS.length&&ANL[B.id+':'+UNITS[S.unitIdx].n];
+  card.dataset.has=(has||pkg)?'1':'0'; renderUnits();
+  if(!has&&!pkg){card.innerHTML=`<div class="empty">📖 ${B.name} için PDF'i bir kere yükle.<br><br><label class="btn primary">${B.name} PDF'ini seç<input type="file" accept="application/pdf" id="fileR2"></label></div>`;
     $('fileR2').onchange=e=>handleUpload(B.file,e.target.files[0]);return}
   if(S.unitIdx>=UNITS.length){card.innerHTML=`<div class="empty">🎉 ${B.name} bitti! ${B.id==='r1'?'Soldan Reader 2\'ye geçebilirsin.':'Sırada IELTS okuma parçaları var.'}</div>`;return}
   const u=UNITS[S.unitIdx];
   card.innerHTML=`<div class="loading">Ünite ${u.n} hazırlanıyor…</div>`;
-  let data; try{data=await unitText(S.unitIdx)}catch(e){card.innerHTML='<div class="empty">PDF okunamadı. Ayarlar\'dan tekrar yüklemeyi dene.</div>';return}
+  let data=null; if(has){try{data=await unitText(S.unitIdx)}catch(e){data=null}}
+  if((!data||!data.found||!data.paras.length)&&pkg)data=pkgText(pkg);
+  if(!data){card.innerHTML='<div class="empty">PDF okunamadı. Ayarlar\'dan tekrar yüklemeyi dene.</div>';return}
   current={u,data};
   stopTTS(); S.st=S.st||{}; S.seen=S.seen||{};
   let mode=LS.get('rmode','study'); if(mode!=='dict')mode='study';
   const veil=LS.get('veil',true); S.dict=S.dict||{}; const dct=S.dict[u.n]||{};
-  const sents=data.paras.map(p=>splitSentences(p)); const flat=[];sents.forEach((ss,i)=>ss.forEach((x,j)=>flat.push({id:i+'.'+j,t:x})));
+  const sents=data.pre||data.paras.map((p,i)=>splitSentences(p).map((x,j)=>({id:i+'.'+j,t:x}))); const flat=[].concat(...sents);
   const pct=Math.round(S.unitIdx/UNITS.length*100);
   const sk=B.id+':'+u.n, seen=S.seen[sk]||{};
   const nAnl=flat.filter(f=>anlFor(u,f)).length, nSeen=flat.filter(f=>seen[f.id]).length;
@@ -754,7 +759,7 @@ async function renderReader(){
         <div class="lbar">${TTS.ok?`<button class="btn small" id="playAll">▶ Dinle</button><select id="rateSel" title="Hız">${[0.7,0.85,1,1.15].map(r=>`<option value="${r}" ${+LS.get('rate',0.85)===r?'selected':''}>${r}x</option>`).join('')}</select><select id="voiceSel" title="Ses"></select>`:''}
           ${mode==='dict'?`<button class="btn small" id="veilBtn">${veil?'Metni göster':'Metni gizle'}</button>`:''}</div></div>
       ${S.hl&&mode==='study'?'<div class="legend"><span><i style="background:var(--B1)"></i>B1</span><span><i style="background:var(--B2)"></i>B2</span><span><i style="background:var(--C1)"></i>C1</span><span><i style="background:var(--yellow-bg);height:10px"></i>kelimelerim</span><span><i style="background:var(--purple-bg);height:10px;border-bottom:2px solid var(--B1)"></i>kalıplarım</span><span style="margin-left:auto">Kelimeye tıkla: anlam · birkaç kelime seç: kalıp ekle</span></div>':''}
-      <div class="reading en${mode==='dict'&&veil?' veil':''}" id="readText">${sents.map((ss,i)=>`<p>${ss.map((x,j)=>`<span class="sent${seen[i+'.'+j]?' has':''}" data-id="${i}.${j}">${wrapWords(x)}</span>`).join(' ')}</p>`).join('')}</div>
+      <div class="reading en${mode==='dict'&&veil?' veil':''}" id="readText">${sents.map(ss=>`<p>${ss.map(x=>`<span class="sent${seen[x.id]?' has':''}" data-id="${x.id}">${wrapWords(x.t)}</span>`).join(' ')}</p>`).join('')}</div>
       ${data.questions?`<details class="qs"><summary>Ünitenin soruları</summary><pre>${esc(data.questions)}</pre></details>`:''}
       ${mode==='study'?`
       <div class="sec2"><h3>Cümle cümle</h3><span id="sCount">${nSeen} / ${flat.length} cümle çalışıldı</span></div>
@@ -909,6 +914,9 @@ document.addEventListener('mouseup',e=>{
 let ANL={};
 const nnS=s=>(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function anlFor(u,f){const U=ANL[B.id+':'+u.n];if(!U)return null;const a=U[f.id];if(a&&nnS(a.en)===nnS(f.t))return a;return Object.values(U).find(x=>nnS(x.en)===nnS(f.t))||null}
+function pkgText(U){const ids=Object.keys(U).sort((a,b)=>{const[x1,y1]=a.split('.').map(Number),[x2,y2]=b.split('.').map(Number);return x1-x2||y1-y2});
+  const g=[];let last=null;for(const id of ids){const p=id.split('.')[0];if(p!==last){g.push([]);last=p}g[g.length-1].push({id,t:U[id].en})}
+  return {found:true,paras:g.map(x=>x.map(y=>y.t).join(' ')),pre:g,fromPkg:true}}
 async function loadAnl(){try{ANL=(await getFile('anl'))||{}}catch(_){ANL={}}}
 function chipKey(w,phrase){if(phrase||w.includes(' '))return w.toLowerCase();const o=lookup(w.replace(/\s*\(.*$/,''));return o?o.key:w.toLowerCase()}
 function wordChip(w,m,phrase,ex){const have=!!S.words[chipKey(w,phrase)];
@@ -1323,7 +1331,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
 /* ---------- setup ---------- */
 async function handleUpload(k,f){
   if(!f)return; if(f.type&&f.type!=='application/pdf'){toast('Lütfen PDF seç');return}
-  try{await putFile(k,f);LS.set('fname_'+k,f.name);delete docs[k];const d=await loadDoc(k);
+  try{await putFile(k,await f.arrayBuffer());LS.set('fname_'+k,f.name);askPersist();delete docs[k];const d=await loadDoc(k);
     toast(`${(BOOKS.find(b=>b.file===k)||{}).name||'Kitap'} yüklendi (${d.numPages} sayfa) 📚`)}
   catch(e){toast('PDF açılamadı');console.error(e);return}
   renderSetup();if(k===B.file)renderReader();
@@ -1360,7 +1368,8 @@ $('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='d
 function init(){const h=new Date().getHours();
   $('greet').textContent=h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar';
   renderPlan();updateCounts();loadAnl().then(renderReader);notifyDue();
-  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}}
+  askPersist()}
+function askPersist(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateCounts();notifyDue()}});
 init();
 </script>
