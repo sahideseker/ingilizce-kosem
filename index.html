@@ -1997,7 +1997,7 @@ function renderGames(){
   document.querySelectorAll('#poolSeg button').forEach(b=>b.onclick=()=>{if(b.disabled)return;pool=b.dataset.p==='ox'?oxLvl:b.dataset.p;renderGames()});
   $('lvlSeg').hidden=!isOx;$('lvlSeg').innerHTML=['B1','B2','C1'].map(l=>`<button data-l="${l}" class="${pool===l?'on':''}">${l}</button>`).join('');
   document.querySelectorAll('#lvlSeg button').forEach(b=>b.onclick=()=>{pool=oxLvl=b.dataset.l;LS.set('oxLvl',oxLvl);renderGames()});
-  $('poolInfo').textContent=n('mine')<4&&!isOx?'':({mine:'Eklediğin tüm kelimeler.',yds:'Sözlükten ve YDS kitabından eklediğin kelimeler.',due:'Bugün tekrar zamanı gelen kelimelerin; kartlara ek pratik.'}[pool]
+  $('poolInfo').textContent=n('mine')<4&&!isOx?'':({mine:'Eklediğin tüm kelimeler.',yds:'Sözlükten ve YDS kitabından eklediğin kelimeler.',due:'Bugün tekrar sırası gelen kelimeler. Kelime tekrarı kartlarını bitirdikten sonra aynı kelimelerle bir de oyun oynayarak pekiştirebilirsin. Oyun, kelimenin öğrenilme durumunu değiştirmez.'}[pool]
     ||'Oxford listesinden rastgele kelimeler. Bilmediklerini oyun sonunda tek tıkla Kelimelerim\'e ekleyebilirsin.')+(n('mine')<4&&!isOx?'':'')+(n('mine')<4?' Kendi kelimelerinle oynamak için en az 4 kelime ekle.':'');
   const G=[['match','🧩','Eşleştir','6 kelimeyi Türkçe anlamlarıyla eşleştir.'],
            ['quiz','🎯','Anlam bul','Kelimeyi gör, doğru anlamı 4 şıktan seç. 10 soru.'],
