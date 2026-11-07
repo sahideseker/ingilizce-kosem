@@ -408,7 +408,8 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 <aside class="side">
   <div class="brand"><div class="logo">E</div>İngilizce Köşem</div>
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-v="today"><span class="i">◎</span>Bugün</button>
+    <button class="tab active" data-v="today"><span class="i">▤</span>Metinler</button>
+    <button class="tab" data-v="plan"><span class="i">◎</span>Günlük plan</button>
     <button class="tab" data-v="review"><span class="i">↻</span>Tekrar<span class="badge" id="dueBadge" hidden>0</span></button>
     <button class="tab" data-v="words"><span class="i">≡</span>Kelimelerim</button>
     <button class="tab" data-v="grammar"><span class="i">¶</span>Gramer</button>
@@ -426,6 +427,13 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
 <main class="main">
   <!-- TODAY -->
   <section class="view active" id="v-today">
+    <div class="card" id="readerCard">
+      <div class="loading">Yükleniyor…</div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="v-plan">
     <div class="page-h"><h1 id="greet">Bugün</h1></div>
     <div class="card">
       <div class="plan">
@@ -437,9 +445,6 @@ select{font:inherit;font-size:14px;background:var(--panel);border:1px solid var(
       </div>
     </div>
     <div class="card" id="remind" hidden></div>
-    <div class="card" id="readerCard">
-      <div class="loading">Yükleniyor…</div>
-    </div>
   </section>
 
   <!-- REVIEW -->
@@ -1202,10 +1207,10 @@ function updateCounts(){
   $('learnedChip').textContent=Object.values(S.words).filter(v=>v.box>=5).length;
 }
 $('stG').onclick=()=>{const ni=nextYds();openDrawer(ni>=0?YDSN[ni].id:undefined)};
-$('stR').onclick=()=>$('readerCard').scrollIntoView({behavior:'smooth'});
+$('stR').onclick=()=>go('today');
 $('stV').onclick=()=>go('review');
 $('stY').onclick=()=>{const yDue=dueList().filter(([k,v])=>isYds(v)).length;if(yDue&&(S.log[dayKey()]||{}).yds){revPool='yds';LS.set('revPool','yds');go('review')}else{go('words');setTimeout(()=>$('ydsIn').focus(),50)}};
-$('stL').onclick=()=>{LS.set('rmode','dict');renderReader();setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth'}),100)};
+$('stL').onclick=()=>{LS.set('rmode','dict');go('today');renderReader();setTimeout(()=>$('readerCard').scrollIntoView({behavior:'smooth'}),100)};
 
 /* ---------- dictionary ---------- */
 const OXK=Object.keys(OXFORD);
@@ -1323,7 +1328,7 @@ function notifyDue(force){try{if(!('Notification' in window)||Notification.permi
 function go(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='v-'+v));
   stopTTS(); if(v==='listen')renderListen();
-  if(v==='games')renderGames(); if(v==='today')renderRemind();
+  if(v==='games')renderGames(); if(v==='plan'){renderPlan();renderRemind()}
   if(v==='review'){queue=[];renderReview()} if(v==='words')renderWords(); if(v==='grammar')renderGrammar(); if(v==='setup')renderSetup(); hidePop()}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
 
